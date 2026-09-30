@@ -1,0 +1,45 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <!-- Cash Register Body / Base -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M28,68 L80,68 C82.2,68 84,69.8 84,72 L84,76 C84,78.2 82.2,80 80,80 L28,80 C25.8,80 24,78.2 24,76 L24,72 C24,69.8 25.8,68 28,68 Z" />
+    <!-- Drawer Lock/Handle -->
+    <path
+        android:fillColor="#0284C7"
+        android:pathData="M50,73 L58,73 C58.6,73 59,73.4 59,74 L59,75 C59,75.6 58.6,76 58,76 L50,76 C49.4,76 49,75.6 49,75 L49,74 C49,73.4 49.4,73 50,73 Z" />
+    <!-- Middle Console / Keypad Base -->
+    <path
+        android:fillColor="#E2E8F0"
+        android:pathData="M29,66 L79,66 L74,48 L34,48 Z" />
+    <!-- Keypad Keys -->
+    <path
+        android:fillColor="#0284C7"
+        android:pathData="M37,52 L43,52 L43,56 L37,56 Z M46,52 L52,52 L52,56 L46,56 Z M55,52 L61,52 L61,56 L55,56 Z M39,59 L45,59 L45,63 L39,63 Z M48,59 L54,59 L54,63 L48,63 Z M57,59 L69,59 L69,63 L57,63 Z" />
+    <!-- Screen Monitor / Stand -->
+    <path
+        android:fillColor="#CBD5E1"
+        android:pathData="M51,48 L57,48 L57,42 L51,42 Z" />
+    <!-- POS Screen Frame -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M34,26 L74,26 C75.7,26 77,27.3 77,29 L77,43 C77,44.7 75.7,46 74,46 L34,46 C32.3,46 31,44.7 31,43 L31,29 C31,27.3 32.3,26 34,26 Z" />
+    <!-- Display Screen (Active Glowing Blue) -->
+    <path
+        android:fillColor="#0284C7"
+        android:pathData="M34,29 L74,29 L74,43 L34,43 Z" />
+    <!-- Screen Barcode & Total Line -->
+    <path
+        android:fillColor="#38BDF8"
+        android:pathData="M38,32 L40,32 L40,40 L38,40 Z M42,32 L43,32 L43,40 L42,40 Z M45,32 L48,32 L48,40 L45,40 Z M50,32 L51,32 L51,40 L50,40 Z M53,32 L55,32 L55,40 L53,40 Z" />
+    <path
+        android:fillColor="#FBBF24"
+        android:pathData="M59,34 L70,34 L70,36 L59,36 Z M59,38 L67,38 L67,40 L59,40 Z" />
+    <!-- Thermal Receipt Paper Roll -->
+    <path
+        android:fillColor="#F8FAFC"
+        android:pathData="M65,48 L73,48 L73,56 L69,54 L65,56 Z" />
+</vector>

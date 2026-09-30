@@ -1,0 +1,6 @@
+{
+  "name": "ShopPOS",
+  "description": "Offline Point of Sale and Inventory Management for retail shops.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
