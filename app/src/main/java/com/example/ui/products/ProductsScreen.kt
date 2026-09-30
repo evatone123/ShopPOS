@@ -108,7 +108,7 @@ fun ProductsScreen(
             ExtendedFloatingActionButton(
                 onClick = { showAddDialog = true },
                 icon = { Icon(Icons.Default.Add, contentDescription = null) },
-                text = { Text("Add Product") },
+                text = { Text("Add Product", maxLines = 1, softWrap = false) },
                 modifier = Modifier.testTag("add_product_fab")
             )
         },
@@ -219,11 +219,17 @@ fun ProductsScreen(
                     Box {
                         OutlinedButton(
                             onClick = { sortMenuExpanded = true },
+                            contentPadding = PaddingValues(horizontal = 10.dp, vertical = 6.dp),
                             shape = RoundedCornerShape(10.dp)
                         ) {
-                            Icon(Icons.Default.Sort, contentDescription = null, modifier = Modifier.size(16.dp))
-                            Spacer(modifier = Modifier.width(4.dp))
-                            Text(uiState.sortOption.label)
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.Center
+                            ) {
+                                Icon(Icons.Default.Sort, contentDescription = null, modifier = Modifier.size(16.dp))
+                                Spacer(modifier = Modifier.width(4.dp))
+                                Text(uiState.sortOption.label, maxLines = 1, softWrap = false)
+                            }
                         }
 
                         DropdownMenu(

@@ -263,11 +263,17 @@ fun SettingsScreen(
                                 )
                                 viewModel.updateSettings(updated)
                             },
+                            contentPadding = PaddingValues(horizontal = 14.dp, vertical = 10.dp),
                             modifier = Modifier.align(Alignment.End)
                         ) {
-                            Icon(Icons.Default.Save, contentDescription = null, modifier = Modifier.size(18.dp))
-                            Spacer(modifier = Modifier.width(6.dp))
-                            Text("Save Shop Settings")
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.Center
+                            ) {
+                                Icon(Icons.Default.Save, contentDescription = null, modifier = Modifier.size(18.dp))
+                                Spacer(modifier = Modifier.width(6.dp))
+                                Text("Save Shop Settings", maxLines = 1, softWrap = false)
+                            }
                         }
                     }
                 }
@@ -343,9 +349,10 @@ fun SettingsScreen(
                                     viewModel.updateSettings(updated)
                                 },
                                 enabled = securityPin.length >= 4,
+                                contentPadding = PaddingValues(horizontal = 14.dp, vertical = 8.dp),
                                 modifier = Modifier.align(Alignment.End)
                             ) {
-                                Text("Update PIN")
+                                Text("Update PIN", maxLines = 1, softWrap = false)
                             }
                         }
                     }
@@ -389,7 +396,8 @@ fun SettingsScreen(
 
                         Row(
                             modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.spacedBy(10.dp)
+                            horizontalArrangement = Arrangement.spacedBy(10.dp),
+                            verticalAlignment = Alignment.CenterVertically
                         ) {
                             Button(
                                 onClick = {
@@ -397,14 +405,20 @@ fun SettingsScreen(
                                 },
                                 colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF16A34A)),
                                 enabled = !uiState.isExporting,
+                                contentPadding = PaddingValues(horizontal = 10.dp, vertical = 10.dp),
                                 modifier = Modifier.weight(1f)
                             ) {
-                                if (uiState.isExporting) {
-                                    CircularProgressIndicator(modifier = Modifier.size(16.dp), color = MaterialTheme.colorScheme.onPrimary, strokeWidth = 2.dp)
-                                } else {
-                                    Icon(Icons.Default.Backup, contentDescription = null, modifier = Modifier.size(18.dp))
-                                    Spacer(modifier = Modifier.width(6.dp))
-                                    Text("Export Backup")
+                                Row(
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    horizontalArrangement = Arrangement.Center
+                                ) {
+                                    if (uiState.isExporting) {
+                                        CircularProgressIndicator(modifier = Modifier.size(16.dp), color = MaterialTheme.colorScheme.onPrimary, strokeWidth = 2.dp)
+                                    } else {
+                                        Icon(Icons.Default.Backup, contentDescription = null, modifier = Modifier.size(17.dp))
+                                        Spacer(modifier = Modifier.width(5.dp))
+                                        Text("Export Backup", maxLines = 1, softWrap = false, style = MaterialTheme.typography.labelMedium)
+                                    }
                                 }
                             }
 
@@ -413,14 +427,20 @@ fun SettingsScreen(
                                     importLauncher.launch(arrayOf("application/json", "text/plain", "*/*"))
                                 },
                                 enabled = !uiState.isImporting,
+                                contentPadding = PaddingValues(horizontal = 10.dp, vertical = 10.dp),
                                 modifier = Modifier.weight(1f)
                             ) {
-                                if (uiState.isImporting) {
-                                    CircularProgressIndicator(modifier = Modifier.size(16.dp), strokeWidth = 2.dp)
-                                } else {
-                                    Icon(Icons.Default.Restore, contentDescription = null, modifier = Modifier.size(18.dp))
-                                    Spacer(modifier = Modifier.width(6.dp))
-                                    Text("Import Backup")
+                                Row(
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    horizontalArrangement = Arrangement.Center
+                                ) {
+                                    if (uiState.isImporting) {
+                                        CircularProgressIndicator(modifier = Modifier.size(16.dp), strokeWidth = 2.dp)
+                                    } else {
+                                        Icon(Icons.Default.Restore, contentDescription = null, modifier = Modifier.size(17.dp))
+                                        Spacer(modifier = Modifier.width(5.dp))
+                                        Text("Import Backup", maxLines = 1, softWrap = false, style = MaterialTheme.typography.labelMedium)
+                                    }
                                 }
                             }
                         }
@@ -471,11 +491,17 @@ fun SettingsScreen(
 
                         Button(
                             onClick = { viewModel.loadDemoData() },
+                            contentPadding = PaddingValues(horizontal = 12.dp, vertical = 6.dp),
                             colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF7C3AED))
                         ) {
-                            Icon(Icons.Default.AutoAwesome, contentDescription = null, modifier = Modifier.size(16.dp))
-                            Spacer(modifier = Modifier.width(4.dp))
-                            Text("Load")
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.Center
+                            ) {
+                                Icon(Icons.Default.AutoAwesome, contentDescription = null, modifier = Modifier.size(16.dp))
+                                Spacer(modifier = Modifier.width(4.dp))
+                                Text("Load", maxLines = 1, softWrap = false)
+                            }
                         }
                     }
                 }
@@ -525,11 +551,12 @@ fun SettingsScreen(
                             viewModel.importBackup(context, uri, replaceExistingData)
                         }
                     },
+                    contentPadding = PaddingValues(horizontal = 12.dp, vertical = 8.dp),
                     colors = ButtonDefaults.buttonColors(
                         containerColor = if (replaceExistingData) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.primary
                     )
                 ) {
-                    Text(if (replaceExistingData) "Replace & Restore" else "Merge & Restore")
+                    Text(if (replaceExistingData) "Replace & Restore" else "Merge & Restore", maxLines = 1, softWrap = false)
                 }
             },
             dismissButton = {
@@ -537,9 +564,10 @@ fun SettingsScreen(
                     onClick = {
                         showRestoreConfirmDialog = false
                         pendingRestoreUri = null
-                    }
+                    },
+                    contentPadding = PaddingValues(horizontal = 12.dp, vertical = 8.dp)
                 ) {
-                    Text("Cancel")
+                    Text("Cancel", maxLines = 1, softWrap = false)
                 }
             }
         )

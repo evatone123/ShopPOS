@@ -160,27 +160,42 @@ fun PosScreen(
                                 )
                             }
 
-                            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                            Row(
+                                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
                                 OutlinedButton(
                                     onClick = { showMobileCartSheet = true },
-                                    shape = RoundedCornerShape(12.dp)
+                                    shape = RoundedCornerShape(12.dp),
+                                    contentPadding = PaddingValues(horizontal = 10.dp, vertical = 6.dp)
                                 ) {
-                                    Icon(Icons.Default.ShoppingCart, contentDescription = null, modifier = Modifier.size(16.dp))
-                                    Spacer(modifier = Modifier.width(4.dp))
-                                    Text("View Cart")
+                                    Row(
+                                        verticalAlignment = Alignment.CenterVertically,
+                                        horizontalArrangement = Arrangement.Center
+                                    ) {
+                                        Icon(Icons.Default.ShoppingCart, contentDescription = null, modifier = Modifier.size(16.dp))
+                                        Spacer(modifier = Modifier.width(4.dp))
+                                        Text("Cart", maxLines = 1, softWrap = false)
+                                    }
                                 }
 
                                 Button(
                                     onClick = { viewModel.startCheckout() },
                                     shape = RoundedCornerShape(12.dp),
+                                    contentPadding = PaddingValues(horizontal = 14.dp, vertical = 6.dp),
                                     colors = ButtonDefaults.buttonColors(
                                         containerColor = Color(0xFF10B981)
                                     ),
                                     modifier = Modifier.testTag("pos_mobile_checkout_btn")
                                 ) {
-                                    Icon(Icons.Default.ShoppingCartCheckout, contentDescription = null, modifier = Modifier.size(18.dp))
-                                    Spacer(modifier = Modifier.width(6.dp))
-                                    Text("Pay", fontWeight = FontWeight.Bold)
+                                    Row(
+                                        verticalAlignment = Alignment.CenterVertically,
+                                        horizontalArrangement = Arrangement.Center
+                                    ) {
+                                        Icon(Icons.Default.ShoppingCartCheckout, contentDescription = null, modifier = Modifier.size(18.dp))
+                                        Spacer(modifier = Modifier.width(6.dp))
+                                        Text("Pay", fontWeight = FontWeight.Bold, maxLines = 1, softWrap = false)
+                                    }
                                 }
                             }
                         }
@@ -881,20 +896,28 @@ fun CartContent(
                     onClick = onCheckout,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(54.dp)
+                        .height(52.dp)
                         .testTag("pos_checkout_button"),
+                    contentPadding = PaddingValues(horizontal = 12.dp, vertical = 8.dp),
                     colors = ButtonDefaults.buttonColors(
                         containerColor = Color(0xFF10B981)
                     ),
                     shape = RoundedCornerShape(16.dp)
                 ) {
-                    Icon(Icons.Default.ShoppingCartCheckout, contentDescription = null, modifier = Modifier.size(22.dp))
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Text(
-                        text = "CHECKOUT (${CurrencyFormatter.formatPesewas(uiState.totalPesewas, uiState.settings.currency)})",
-                        fontWeight = FontWeight.ExtraBold,
-                        fontSize = 15.sp
-                    )
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.Center
+                    ) {
+                        Icon(Icons.Default.ShoppingCartCheckout, contentDescription = null, modifier = Modifier.size(20.dp))
+                        Spacer(modifier = Modifier.width(6.dp))
+                        Text(
+                            text = "CHECKOUT (${CurrencyFormatter.formatPesewas(uiState.totalPesewas, uiState.settings.currency)})",
+                            fontWeight = FontWeight.ExtraBold,
+                            fontSize = 15.sp,
+                            maxLines = 1,
+                            softWrap = false
+                        )
+                    }
                 }
             }
         }

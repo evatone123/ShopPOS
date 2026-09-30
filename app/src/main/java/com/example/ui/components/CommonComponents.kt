@@ -6,6 +6,7 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -271,8 +272,11 @@ fun EmptyStateView(
 
         if (actionText != null && onAction != null) {
             Spacer(modifier = Modifier.height(16.dp))
-            Button(onClick = onAction) {
-                Text(actionText)
+            Button(
+                onClick = onAction,
+                contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp)
+            ) {
+                Text(actionText, maxLines = 1, softWrap = false)
             }
         }
     }

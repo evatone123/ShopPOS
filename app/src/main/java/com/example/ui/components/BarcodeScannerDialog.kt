@@ -14,6 +14,7 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -215,11 +216,17 @@ fun BarcodeScannerDialog(
 
                     OutlinedButton(
                         onClick = { useManualEntry = true },
+                        contentPadding = PaddingValues(horizontal = 12.dp, vertical = 8.dp),
                         modifier = Modifier.fillMaxWidth()
                     ) {
-                        Icon(Icons.Default.Keyboard, contentDescription = null)
-                        Spacer(modifier = Modifier.width(8.dp))
-                        Text("Type Barcode / External Scanner")
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.Center
+                        ) {
+                            Icon(Icons.Default.Keyboard, contentDescription = null, modifier = Modifier.size(18.dp))
+                            Spacer(modifier = Modifier.width(6.dp))
+                            Text("Type Barcode / Scanner", maxLines = 1, softWrap = false)
+                        }
                     }
                 } else {
                     // Manual entry or external scanner mode
@@ -256,20 +263,27 @@ fun BarcodeScannerDialog(
                                     }
                                 },
                                 enabled = manualBarcode.isNotBlank(),
+                                contentPadding = PaddingValues(horizontal = 14.dp, vertical = 8.dp),
                                 modifier = Modifier.fillMaxWidth()
                             ) {
-                                Text("Submit Barcode")
+                                Text("Submit Barcode", maxLines = 1, softWrap = false)
                             }
 
                             if (hasCameraPermission) {
                                 Spacer(modifier = Modifier.height(8.dp))
                                 OutlinedButton(
                                     onClick = { useManualEntry = false },
+                                    contentPadding = PaddingValues(horizontal = 14.dp, vertical = 8.dp),
                                     modifier = Modifier.fillMaxWidth()
                                 ) {
-                                    Icon(Icons.Default.CameraAlt, contentDescription = null)
-                                    Spacer(modifier = Modifier.width(8.dp))
-                                    Text("Switch to Camera")
+                                    Row(
+                                        verticalAlignment = Alignment.CenterVertically,
+                                        horizontalArrangement = Arrangement.Center
+                                    ) {
+                                        Icon(Icons.Default.CameraAlt, contentDescription = null, modifier = Modifier.size(18.dp))
+                                        Spacer(modifier = Modifier.width(6.dp))
+                                        Text("Switch to Camera", maxLines = 1, softWrap = false)
+                                    }
                                 }
                             }
                         }

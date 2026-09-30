@@ -2,6 +2,7 @@ package com.example.ui.components
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -214,10 +215,14 @@ fun StockAdjustmentDialog(
 
                 Row(
                     modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.End
+                    horizontalArrangement = Arrangement.End,
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
-                    OutlinedButton(onClick = onDismiss) {
-                        Text("Cancel")
+                    OutlinedButton(
+                        onClick = onDismiss,
+                        contentPadding = PaddingValues(horizontal = 14.dp, vertical = 8.dp)
+                    ) {
+                        Text("Cancel", maxLines = 1, softWrap = false)
                     }
                     Spacer(modifier = Modifier.width(10.dp))
                     Button(
@@ -236,9 +241,10 @@ fun StockAdjustmentDialog(
                                 return@Button
                             }
                             onConfirm(selectedType, qty, reasonText.trim())
-                        }
+                        },
+                        contentPadding = PaddingValues(horizontal = 14.dp, vertical = 8.dp)
                     ) {
-                        Text("Save Adjustment")
+                        Text("Save Adjustment", maxLines = 1, softWrap = false)
                     }
                 }
             }

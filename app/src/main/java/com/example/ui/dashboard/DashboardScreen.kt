@@ -5,6 +5,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -224,51 +225,90 @@ fun DashboardScreen(
                 Spacer(modifier = Modifier.height(10.dp))
                 Row(
                     modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(10.dp)
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
                     Button(
                         onClick = onNavigateToPos,
                         modifier = Modifier
-                            .weight(1.2f)
+                            .weight(1.1f)
+                            .height(44.dp)
                             .testTag("dashboard_new_sale_btn"),
+                        contentPadding = PaddingValues(horizontal = 6.dp, vertical = 4.dp),
                         colors = ButtonDefaults.buttonColors(
                             containerColor = Color(0xFF10B981)
                         ),
-                        shape = RoundedCornerShape(14.dp)
+                        shape = RoundedCornerShape(12.dp)
                     ) {
-                        Icon(Icons.Default.AddShoppingCart, contentDescription = null, modifier = Modifier.size(19.dp))
-                        Spacer(modifier = Modifier.width(6.dp))
-                        Text("New Sale", fontWeight = FontWeight.Bold)
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.Center
+                        ) {
+                            Icon(Icons.Default.AddShoppingCart, contentDescription = null, modifier = Modifier.size(16.dp))
+                            Spacer(modifier = Modifier.width(4.dp))
+                            Text(
+                                text = "New Sale",
+                                fontWeight = FontWeight.Bold,
+                                style = MaterialTheme.typography.labelMedium,
+                                maxLines = 1,
+                                softWrap = false
+                            )
+                        }
                     }
 
                     Button(
                         onClick = onNavigateToAddProduct,
                         modifier = Modifier
                             .weight(1f)
+                            .height(44.dp)
                             .testTag("dashboard_add_product_btn"),
+                        contentPadding = PaddingValues(horizontal = 6.dp, vertical = 4.dp),
                         colors = ButtonDefaults.buttonColors(
                             containerColor = Color(0xFF4F46E5)
                         ),
-                        shape = RoundedCornerShape(14.dp)
+                        shape = RoundedCornerShape(12.dp)
                     ) {
-                        Icon(Icons.Default.AddCircleOutline, contentDescription = null, modifier = Modifier.size(18.dp))
-                        Spacer(modifier = Modifier.width(4.dp))
-                        Text("Product", fontWeight = FontWeight.SemiBold)
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.Center
+                        ) {
+                            Icon(Icons.Default.AddCircleOutline, contentDescription = null, modifier = Modifier.size(16.dp))
+                            Spacer(modifier = Modifier.width(4.dp))
+                            Text(
+                                text = "Product",
+                                fontWeight = FontWeight.SemiBold,
+                                style = MaterialTheme.typography.labelMedium,
+                                maxLines = 1,
+                                softWrap = false
+                            )
+                        }
                     }
 
                     Button(
                         onClick = onNavigateToInventory,
                         modifier = Modifier
                             .weight(1f)
+                            .height(44.dp)
                             .testTag("dashboard_add_stock_btn"),
+                        contentPadding = PaddingValues(horizontal = 6.dp, vertical = 4.dp),
                         colors = ButtonDefaults.buttonColors(
                             containerColor = Color(0xFFF59E0B)
                         ),
-                        shape = RoundedCornerShape(14.dp)
+                        shape = RoundedCornerShape(12.dp)
                     ) {
-                        Icon(Icons.Default.Inventory, contentDescription = null, modifier = Modifier.size(18.dp))
-                        Spacer(modifier = Modifier.width(4.dp))
-                        Text("Stock", fontWeight = FontWeight.SemiBold)
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.Center
+                        ) {
+                            Icon(Icons.Default.Inventory, contentDescription = null, modifier = Modifier.size(16.dp))
+                            Spacer(modifier = Modifier.width(4.dp))
+                            Text(
+                                text = "Stock",
+                                fontWeight = FontWeight.SemiBold,
+                                style = MaterialTheme.typography.labelMedium,
+                                maxLines = 1,
+                                softWrap = false
+                            )
+                        }
                     }
                 }
             }

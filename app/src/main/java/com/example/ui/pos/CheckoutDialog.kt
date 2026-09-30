@@ -5,6 +5,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -355,13 +356,15 @@ fun CheckoutDialog(
 
                 Row(
                     modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(10.dp)
+                    horizontalArrangement = Arrangement.spacedBy(10.dp),
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
                     OutlinedButton(
                         onClick = onDismiss,
+                        contentPadding = PaddingValues(horizontal = 12.dp, vertical = 10.dp),
                         modifier = Modifier.weight(1f)
                     ) {
-                        Text("Cancel")
+                        Text("Cancel", maxLines = 1, softWrap = false)
                     }
 
                     Button(
@@ -378,13 +381,19 @@ fun CheckoutDialog(
                             containerColor = Color(0xFF10B981)
                         ),
                         shape = RoundedCornerShape(12.dp),
+                        contentPadding = PaddingValues(horizontal = 8.dp, vertical = 10.dp),
                         modifier = Modifier
                             .weight(1.5f)
                             .testTag("checkout_complete_sale_btn")
                     ) {
-                        Icon(Icons.Default.CheckCircle, contentDescription = null, modifier = Modifier.size(18.dp))
-                        Spacer(modifier = Modifier.width(6.dp))
-                        Text("COMPLETE SALE", fontWeight = FontWeight.Bold)
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.Center
+                        ) {
+                            Icon(Icons.Default.CheckCircle, contentDescription = null, modifier = Modifier.size(17.dp))
+                            Spacer(modifier = Modifier.width(4.dp))
+                            Text("Complete Sale", fontWeight = FontWeight.Bold, maxLines = 1, softWrap = false)
+                        }
                     }
                 }
             }
