@@ -18,9 +18,11 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Assessment
 import androidx.compose.material.icons.filled.BarChart
+import androidx.compose.material.icons.filled.DarkMode
 import androidx.compose.material.icons.filled.Dashboard
 import androidx.compose.material.icons.filled.Inventory
 import androidx.compose.material.icons.filled.Inventory2
+import androidx.compose.material.icons.filled.LightMode
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.PointOfSale
 import androidx.compose.material.icons.filled.ReceiptLong
@@ -88,18 +90,15 @@ enum class PosNavDestination(val label: String, val icon: ImageVector) {
 fun MainScreen(
     repository: PosRepository,
     onLockApp: () -> Unit,
+    onToggleTheme: () -> Unit = {},
     modifier: Modifier = Modifier
 ) {
+    val isDark = com.example.ui.theme.LocalIsDarkTheme.current
     var currentDestination by remember { mutableStateOf(PosNavDestination.DASHBOARD) }
     var prefilledProductBarcode by remember { mutableStateOf<String?>(null) }
 
-    // Instantiate ViewModels
-    val dashboardViewModel: DashboardViewModel = viewModel { DashboardViewModel(repository) }
+    // Core persistent ViewModels needed for app-level navigation state and badge counters
     val posViewModel: PosViewModel = viewModel { PosViewModel(repository) }
-    val productsViewModel: ProductsViewModel = viewModel { ProductsViewModel(repository) }
-    val inventoryViewModel: InventoryViewModel = viewModel { InventoryViewModel(repository) }
-    val salesViewModel: SalesViewModel = viewModel { SalesViewModel(repository) }
-    val reportsViewModel: ReportsViewModel = viewModel { ReportsViewModel(repository) }
     val settingsViewModel: SettingsViewModel = viewModel { SettingsViewModel(repository) }
 
     val posUiState by posViewModel.uiState.collectAsStateWithLifecycle()
@@ -147,9 +146,9 @@ fun MainScreen(
                                 currentDestination = destination
                             },
                             colors = NavigationRailItemDefaults.colors(
-                                selectedIconColor = Color(0xFF4F46E5),
-                                selectedTextColor = Color(0xFF4F46E5),
-                                indicatorColor = Color(0xFFEEF2FF),
+                                selectedIconColor = if (isDark) Color(0xFF818CF8) else Color(0xFF4F46E5),
+                                selectedTextColor = if (isDark) Color(0xFF818CF8) else Color(0xFF4F46E5),
+                                indicatorColor = if (isDark) Color(0xFF312E81) else Color(0xFFEEF2FF),
                                 unselectedIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
                                 unselectedTextColor = MaterialTheme.colorScheme.onSurfaceVariant
                             ),
@@ -175,6 +174,14 @@ fun MainScreen(
 
                     Spacer(modifier = Modifier.weight(1f))
 
+                    IconButton(onClick = onToggleTheme, modifier = Modifier.padding(bottom = 8.dp)) {
+                        Icon(
+                            imageVector = if (isDark) Icons.Default.LightMode else Icons.Default.DarkMode,
+                            contentDescription = if (isDark) "Switch to Light Mode" else "Switch to Dark Mode",
+                            tint = if (isDark) Color(0xFFFBBF24) else MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+
                     if (settingsUiState.settings.pinLockEnabled) {
                         IconButton(onClick = onLockApp, modifier = Modifier.padding(bottom = 12.dp)) {
                             Icon(Icons.Default.Lock, contentDescription = "Lock POS")
@@ -187,12 +194,8 @@ fun MainScreen(
                     ScreenContent(
                         destination = currentDestination,
                         prefilledBarcode = prefilledProductBarcode,
-                        dashboardViewModel = dashboardViewModel,
+                        repository = repository,
                         posViewModel = posViewModel,
-                        productsViewModel = productsViewModel,
-                        inventoryViewModel = inventoryViewModel,
-                        salesViewModel = salesViewModel,
-                        reportsViewModel = reportsViewModel,
                         settingsViewModel = settingsViewModel,
                         onNavigate = { dest ->
                             prefilledProductBarcode = null
@@ -218,7 +221,7 @@ fun MainScreen(
                                 Box(
                                     modifier = Modifier
                                         .size(28.dp)
-                                        .background(Color(0xFF4F46E5), CircleShape),
+                                        .background(if (isDark) Color(0xFF312E81) else Color(0xFF4F46E5), CircleShape),
                                     contentAlignment = Alignment.Center
                                 ) {
                                     Icon(
@@ -237,7 +240,7 @@ fun MainScreen(
                                     fontWeight = FontWeight.Bold
                                 )
                                 Surface(
-                                    color = Color(0xFFDCFCE7),
+                                    color = if (isDark) Color(0xFF064E3B).copy(alpha = 0.5f) else Color(0xFFDCFCE7),
                                     shape = CircleShape
                                 ) {
                                     Row(
@@ -247,37 +250,44 @@ fun MainScreen(
                                         Box(
                                             modifier = Modifier
                                                 .size(6.dp)
-                                                .background(Color(0xFF10B981), CircleShape)
+                                                .background(if (isDark) Color(0xFF34D399) else Color(0xFF10B981), CircleShape)
                                         )
                                         Spacer(modifier = Modifier.width(4.dp))
                                         Text(
                                             text = "Offline",
                                             style = MaterialTheme.typography.labelSmall,
                                             fontWeight = FontWeight.Bold,
-                                            color = Color(0xFF047857)
+                                            color = if (isDark) Color(0xFF34D399) else Color(0xFF047857)
                                         )
                                     }
                                 }
                             }
                         },
                         actions = {
+                            IconButton(onClick = onToggleTheme) {
+                                Icon(
+                                    imageVector = if (isDark) Icons.Default.LightMode else Icons.Default.DarkMode,
+                                    contentDescription = if (isDark) "Switch to Light Mode" else "Switch to Dark Mode",
+                                    tint = if (isDark) Color(0xFFFBBF24) else MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                            }
                             IconButton(onClick = { currentDestination = PosNavDestination.REPORTS }) {
                                 Icon(
                                     imageVector = Icons.Default.BarChart,
                                     contentDescription = "Reports",
-                                    tint = if (currentDestination == PosNavDestination.REPORTS) Color(0xFF4F46E5) else MaterialTheme.colorScheme.onSurfaceVariant
+                                    tint = if (currentDestination == PosNavDestination.REPORTS) (if (isDark) Color(0xFF818CF8) else Color(0xFF4F46E5)) else MaterialTheme.colorScheme.onSurfaceVariant
                                 )
                             }
                             IconButton(onClick = { currentDestination = PosNavDestination.SETTINGS }) {
                                 Icon(
                                     imageVector = Icons.Default.Settings,
                                     contentDescription = "Settings",
-                                    tint = if (currentDestination == PosNavDestination.SETTINGS) Color(0xFF4F46E5) else MaterialTheme.colorScheme.onSurfaceVariant
+                                    tint = if (currentDestination == PosNavDestination.SETTINGS) (if (isDark) Color(0xFF818CF8) else Color(0xFF4F46E5)) else MaterialTheme.colorScheme.onSurfaceVariant
                                 )
                             }
                             if (settingsUiState.settings.pinLockEnabled) {
                                 IconButton(onClick = onLockApp) {
-                                    Icon(Icons.Default.Lock, contentDescription = "Lock POS", tint = Color(0xFFD97706))
+                                    Icon(Icons.Default.Lock, contentDescription = "Lock POS", tint = if (isDark) Color(0xFFFBBF24) else Color(0xFFD97706))
                                 }
                             }
                         },
@@ -307,9 +317,9 @@ fun MainScreen(
                                     currentDestination = destination
                                 },
                                 colors = NavigationBarItemDefaults.colors(
-                                    selectedIconColor = Color(0xFF4F46E5),
-                                    selectedTextColor = Color(0xFF4F46E5),
-                                    indicatorColor = Color(0xFFEEF2FF),
+                                    selectedIconColor = if (isDark) Color(0xFF818CF8) else Color(0xFF4F46E5),
+                                    selectedTextColor = if (isDark) Color(0xFF818CF8) else Color(0xFF4F46E5),
+                                    indicatorColor = if (isDark) Color(0xFF312E81) else Color(0xFFEEF2FF),
                                     unselectedIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
                                     unselectedTextColor = MaterialTheme.colorScheme.onSurfaceVariant
                                 ),
@@ -344,12 +354,8 @@ fun MainScreen(
                     ScreenContent(
                         destination = currentDestination,
                         prefilledBarcode = prefilledProductBarcode,
-                        dashboardViewModel = dashboardViewModel,
+                        repository = repository,
                         posViewModel = posViewModel,
-                        productsViewModel = productsViewModel,
-                        inventoryViewModel = inventoryViewModel,
-                        salesViewModel = salesViewModel,
-                        reportsViewModel = reportsViewModel,
                         settingsViewModel = settingsViewModel,
                         onNavigate = { dest ->
                             prefilledProductBarcode = null
@@ -370,43 +376,56 @@ fun MainScreen(
 private fun ScreenContent(
     destination: PosNavDestination,
     prefilledBarcode: String?,
-    dashboardViewModel: DashboardViewModel,
+    repository: PosRepository,
     posViewModel: PosViewModel,
-    productsViewModel: ProductsViewModel,
-    inventoryViewModel: InventoryViewModel,
-    salesViewModel: SalesViewModel,
-    reportsViewModel: ReportsViewModel,
     settingsViewModel: SettingsViewModel,
     onNavigate: (PosNavDestination) -> Unit,
     onNavigateToAddProductWithBarcode: (String) -> Unit
 ) {
     when (destination) {
-        PosNavDestination.DASHBOARD -> DashboardScreen(
-            viewModel = dashboardViewModel,
-            onNavigateToPos = { onNavigate(PosNavDestination.POS) },
-            onNavigateToAddProduct = { onNavigate(PosNavDestination.PRODUCTS) },
-            onNavigateToInventory = { onNavigate(PosNavDestination.INVENTORY) },
-            onNavigateToSales = { onNavigate(PosNavDestination.SALES) }
-        )
+        PosNavDestination.DASHBOARD -> {
+            val dashboardViewModel: DashboardViewModel = viewModel { DashboardViewModel(repository) }
+            DashboardScreen(
+                viewModel = dashboardViewModel,
+                onNavigateToPos = { onNavigate(PosNavDestination.POS) },
+                onNavigateToAddProduct = { onNavigate(PosNavDestination.PRODUCTS) },
+                onNavigateToInventory = { onNavigate(PosNavDestination.INVENTORY) },
+                onNavigateToSales = { onNavigate(PosNavDestination.SALES) }
+            )
+        }
         PosNavDestination.POS -> PosScreen(
             viewModel = posViewModel,
             onNavigateToAddProductWithBarcode = onNavigateToAddProductWithBarcode
         )
-        PosNavDestination.PRODUCTS -> ProductsScreen(
-            viewModel = productsViewModel,
-            prefilledBarcode = prefilledBarcode
-        )
-        PosNavDestination.INVENTORY -> InventoryScreen(
-            viewModel = inventoryViewModel
-        )
-        PosNavDestination.SALES -> SalesScreen(
-            viewModel = salesViewModel
-        )
-        PosNavDestination.REPORTS -> ReportsScreen(
-            viewModel = reportsViewModel
-        )
-        PosNavDestination.SETTINGS -> SettingsScreen(
-            viewModel = settingsViewModel
-        )
+        PosNavDestination.PRODUCTS -> {
+            val productsViewModel: ProductsViewModel = viewModel { ProductsViewModel(repository) }
+            ProductsScreen(
+                viewModel = productsViewModel,
+                prefilledBarcode = prefilledBarcode
+            )
+        }
+        PosNavDestination.INVENTORY -> {
+            val inventoryViewModel: InventoryViewModel = viewModel { InventoryViewModel(repository) }
+            InventoryScreen(
+                viewModel = inventoryViewModel
+            )
+        }
+        PosNavDestination.SALES -> {
+            val salesViewModel: SalesViewModel = viewModel { SalesViewModel(repository) }
+            SalesScreen(
+                viewModel = salesViewModel
+            )
+        }
+        PosNavDestination.REPORTS -> {
+            val reportsViewModel: ReportsViewModel = viewModel { ReportsViewModel(repository) }
+            ReportsScreen(
+                viewModel = reportsViewModel
+            )
+        }
+        PosNavDestination.SETTINGS -> {
+            SettingsScreen(
+                viewModel = settingsViewModel
+            )
+        }
     }
 }

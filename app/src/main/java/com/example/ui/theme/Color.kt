@@ -76,3 +76,31 @@ val DarkSurface = Color(0xFF0F172A)
 val DarkSurfaceVariant = Color(0xFF1E293B)
 val DarkBackground = Color(0xFF090D16)
 
+object AppThemeColors {
+    // Vibrant success/emerald green for prices & in-stock text
+    val successText: Color
+        @androidx.compose.runtime.Composable get() = if (LocalIsDarkTheme.current) Color(0xFF34D399) else Color(0xFF047857)
+
+    // Warning amber text
+    val warningText: Color
+        @androidx.compose.runtime.Composable get() = if (LocalIsDarkTheme.current) Color(0xFFFBBF24) else Color(0xFFB45309)
+
+    // Error rose/red text
+    val errorText: Color
+        @androidx.compose.runtime.Composable get() = if (LocalIsDarkTheme.current) Color(0xFFFB7185) else Color(0xFFBE123C)
+
+    // Alias for danger/alert text
+    val dangerText: Color
+        @androidx.compose.runtime.Composable get() = errorText
+
+    // Info/indigo text
+    val infoText: Color
+        @androidx.compose.runtime.Composable get() = if (LocalIsDarkTheme.current) Color(0xFF818CF8) else Color(0xFF4F46E5)
+
+    // Subtle background for badges/icons
+    @androidx.compose.runtime.Composable
+    fun subtleBackground(tint: Color): Color =
+        if (LocalIsDarkTheme.current) tint.copy(alpha = 0.2f) else tint.copy(alpha = 0.12f)
+}
+
+

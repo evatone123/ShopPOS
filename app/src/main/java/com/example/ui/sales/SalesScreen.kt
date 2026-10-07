@@ -63,7 +63,9 @@ import com.example.data.entity.SaleWithItems
 import com.example.ui.components.EmptyStateView
 import com.example.ui.components.ReceiptDialog
 import com.example.ui.components.SearchInputBar
+import com.example.ui.theme.AppThemeColors
 import com.example.ui.theme.CategoryStyleHelper
+import com.example.ui.theme.LocalIsDarkTheme
 import com.example.util.CurrencyFormatter
 import com.example.util.ReceiptHelper
 import java.text.SimpleDateFormat
@@ -78,6 +80,7 @@ fun SalesScreen(
 ) {
     val context = LocalContext.current
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val isDark = LocalIsDarkTheme.current
     val snackbarHostState = remember { SnackbarHostState() }
 
     var selectedSaleForReceipt by remember { mutableStateOf<SaleWithItems?>(null) }
@@ -259,7 +262,7 @@ fun SalesScreen(
                                             Icon(
                                                 imageVector = if (isCancelled) Icons.Default.Cancel else Icons.Default.CheckCircle,
                                                 contentDescription = null,
-                                                tint = if (isCancelled) MaterialTheme.colorScheme.onErrorContainer else Color(0xFF16A34A),
+                                                tint = if (isCancelled) MaterialTheme.colorScheme.onErrorContainer else AppThemeColors.successText,
                                                 modifier = Modifier.size(12.dp)
                                             )
                                             Spacer(modifier = Modifier.width(4.dp))
@@ -267,7 +270,7 @@ fun SalesScreen(
                                                 text = if (isCancelled) "VOIDED" else "COMPLETED",
                                                 style = MaterialTheme.typography.labelSmall,
                                                 fontWeight = FontWeight.Bold,
-                                                color = if (isCancelled) MaterialTheme.colorScheme.onErrorContainer else Color(0xFF16A34A)
+                                                color = if (isCancelled) MaterialTheme.colorScheme.onErrorContainer else AppThemeColors.successText
                                             )
                                         }
                                     }
@@ -298,7 +301,7 @@ fun SalesScreen(
                                             text = CurrencyFormatter.formatPesewas(sale.totalPesewas, uiState.settings.currency),
                                             style = MaterialTheme.typography.titleMedium,
                                             fontWeight = FontWeight.Black,
-                                            color = if (isCancelled) MaterialTheme.colorScheme.error else Color(0xFF047857)
+                                            color = if (isCancelled) MaterialTheme.colorScheme.error else AppThemeColors.successText
                                         )
                                         Text(
                                             text = "Method: ${sale.paymentMethod} • Cashier: ${sale.cashierName}",

@@ -69,6 +69,8 @@ import com.example.ui.components.SearchInputBar
 import com.example.ui.components.StatCard
 import com.example.ui.components.StockAdjustmentDialog
 import com.example.ui.components.StockStatusBadge
+import com.example.ui.theme.AppThemeColors
+import com.example.ui.theme.LocalIsDarkTheme
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -396,6 +398,7 @@ fun MovementLogCard(
     movement: InventoryMovement,
     productName: String
 ) {
+    val isDark = LocalIsDarkTheme.current
     val dateFormat = SimpleDateFormat("dd MMM, hh:mm a", Locale.US)
     val dateStr = dateFormat.format(Date(movement.createdAt))
 
@@ -403,12 +406,36 @@ fun MovementLogCard(
     val diff = movement.newStock - movement.previousStock
 
     val (badgeBg, iconColor, icon) = when {
-        movement.type.contains("SALE_RETURN") -> Triple(Color(0xFFE0F2FE), Color(0xFF0284C7), Icons.Default.AssignmentReturn)
-        movement.type.contains("SALE") -> Triple(Color(0xFFEEF2FF), Color(0xFF4F46E5), Icons.Default.TrendingDown)
-        movement.type.contains("DAMAGED") || movement.type.contains("EXPIRED") -> Triple(Color(0xFFFFE4E6), Color(0xFFE11D48), Icons.Default.DeleteOutline)
-        movement.type.contains("CORRECTION") -> Triple(Color(0xFFFEF3C7), Color(0xFFD97706), Icons.Default.SwapVert)
-        isAddition -> Triple(Color(0xFFDCFCE7), Color(0xFF16A34A), Icons.Default.TrendingUp)
-        else -> Triple(Color(0xFFFEE2E2), Color(0xFFDC2626), Icons.Default.TrendingDown)
+        movement.type.contains("SALE_RETURN") -> Triple(
+            if (isDark) Color(0xFF0369A1).copy(alpha = 0.35f) else Color(0xFFE0F2FE),
+            if (isDark) Color(0xFF38BDF8) else Color(0xFF0284C7),
+            Icons.Default.AssignmentReturn
+        )
+        movement.type.contains("SALE") -> Triple(
+            if (isDark) Color(0xFF312E81).copy(alpha = 0.35f) else Color(0xFFEEF2FF),
+            if (isDark) Color(0xFF818CF8) else Color(0xFF4F46E5),
+            Icons.Default.TrendingDown
+        )
+        movement.type.contains("DAMAGED") || movement.type.contains("EXPIRED") -> Triple(
+            if (isDark) Color(0xFF881337).copy(alpha = 0.35f) else Color(0xFFFFE4E6),
+            if (isDark) Color(0xFFFB7185) else Color(0xFFE11D48),
+            Icons.Default.DeleteOutline
+        )
+        movement.type.contains("CORRECTION") -> Triple(
+            if (isDark) Color(0xFF78350F).copy(alpha = 0.35f) else Color(0xFFFEF3C7),
+            if (isDark) Color(0xFFFBBF24) else Color(0xFFD97706),
+            Icons.Default.SwapVert
+        )
+        isAddition -> Triple(
+            if (isDark) Color(0xFF064E3B).copy(alpha = 0.35f) else Color(0xFFDCFCE7),
+            if (isDark) Color(0xFF34D399) else Color(0xFF16A34A),
+            Icons.Default.TrendingUp
+        )
+        else -> Triple(
+            if (isDark) Color(0xFF7F1D1D).copy(alpha = 0.35f) else Color(0xFFFEE2E2),
+            if (isDark) Color(0xFFF87171) else Color(0xFFDC2626),
+            Icons.Default.TrendingDown
+        )
     }
 
     Card(
@@ -470,7 +497,7 @@ fun MovementLogCard(
                     text = if (diff > 0) "+$diff" else "$diff",
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.ExtraBold,
-                    color = if (isAddition) Color(0xFF16A34A) else Color(0xFFDC2626)
+                    color = if (isAddition) AppThemeColors.successText else AppThemeColors.dangerText
                 )
                 Text(
                     text = "${movement.previousStock} → ${movement.newStock}",

@@ -67,7 +67,9 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.data.entity.SaleWithItems
 import com.example.ui.components.ReceiptDialog
 import com.example.ui.components.StatCard
+import com.example.ui.theme.AppThemeColors
 import com.example.ui.theme.CategoryStyleHelper
+import com.example.ui.theme.LocalIsDarkTheme
 import com.example.ui.theme.SalesCardGradient
 import com.example.util.CurrencyFormatter
 import java.text.SimpleDateFormat
@@ -84,6 +86,7 @@ fun DashboardScreen(
     modifier: Modifier = Modifier
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val isDark = LocalIsDarkTheme.current
     val snackbarHostState = remember { SnackbarHostState() }
     var selectedSaleForReceipt by remember { mutableStateOf<SaleWithItems?>(null) }
 
@@ -570,7 +573,7 @@ fun DashboardScreen(
                     val sale = saleWithItems.sale
                     val timeFormat = SimpleDateFormat("hh:mm a", Locale.US)
                     val timeStr = timeFormat.format(Date(sale.createdAt))
-                    val paymentStyle = CategoryStyleHelper.getPaymentStyle(sale.paymentMethod)
+                    val paymentStyle = CategoryStyleHelper.getPaymentStyle(sale.paymentMethod, isDark)
 
                     Card(
                         modifier = Modifier
@@ -640,7 +643,7 @@ fun DashboardScreen(
                                     ),
                                     style = MaterialTheme.typography.bodyMedium,
                                     fontWeight = FontWeight.ExtraBold,
-                                    color = if (sale.status == "CANCELLED") MaterialTheme.colorScheme.error else Color(0xFF047857)
+                                    color = if (sale.status == "CANCELLED") MaterialTheme.colorScheme.error else AppThemeColors.successText
                                 )
                                 if (sale.status == "CANCELLED") {
                                     Text(

@@ -48,6 +48,7 @@ object BackupHelper {
             put("logoUri", settings.logoUri ?: "")
             put("securityPin", settings.securityPin)
             put("pinLockEnabled", settings.pinLockEnabled)
+            put("themeMode", settings.themeMode)
         }
         root.put("settings", settingsObj)
 
@@ -185,7 +186,8 @@ object BackupHelper {
                 lowStockThreshold = so.optInt("lowStockThreshold", 10),
                 logoUri = so.optString("logoUri").takeIf { it.isNotBlank() },
                 securityPin = so.optString("securityPin", "1234"),
-                pinLockEnabled = so.optBoolean("pinLockEnabled", false)
+                pinLockEnabled = so.optBoolean("pinLockEnabled", false),
+                themeMode = so.optString("themeMode", "SYSTEM")
             )
         } else null
 

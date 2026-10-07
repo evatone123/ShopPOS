@@ -44,31 +44,33 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.example.data.entity.StockStatus
 import com.example.ui.theme.CategoryStyleHelper
+import com.example.ui.theme.LocalIsDarkTheme
 
 @Composable
 fun StockStatusBadge(
     status: StockStatus,
     modifier: Modifier = Modifier
 ) {
+    val isDark = LocalIsDarkTheme.current
     val (bgColor, textColor, borderColor, icon, label) = when (status) {
         StockStatus.IN_STOCK -> Tuple5(
-            Color(0xFFECFDF5),
-            Color(0xFF047857),
-            Color(0xFFA7F3D0),
+            if (isDark) Color(0xFF064E3B).copy(alpha = 0.55f) else Color(0xFFECFDF5),
+            if (isDark) Color(0xFF34D399) else Color(0xFF047857),
+            if (isDark) Color(0xFF059669).copy(alpha = 0.6f) else Color(0xFFA7F3D0),
             Icons.Default.CheckCircle,
             "IN STOCK"
         )
         StockStatus.LOW_STOCK -> Tuple5(
-            Color(0xFFFFFBEB),
-            Color(0xFFB45309),
-            Color(0xFFFDE68A),
+            if (isDark) Color(0xFF78350F).copy(alpha = 0.55f) else Color(0xFFFFFBEB),
+            if (isDark) Color(0xFFFBBF24) else Color(0xFFB45309),
+            if (isDark) Color(0xFFD97706).copy(alpha = 0.6f) else Color(0xFFFDE68A),
             Icons.Default.WarningAmber,
             "LOW STOCK"
         )
         StockStatus.OUT_OF_STOCK -> Tuple5(
-            Color(0xFFFFF1F2),
-            Color(0xFFBE123C),
-            Color(0xFFFECDD3),
+            if (isDark) Color(0xFF881337).copy(alpha = 0.55f) else Color(0xFFFFF1F2),
+            if (isDark) Color(0xFFFB7185) else Color(0xFFBE123C),
+            if (isDark) Color(0xFFE11D48).copy(alpha = 0.6f) else Color(0xFFFECDD3),
             Icons.Default.ErrorOutline,
             "OUT OF STOCK"
         )
@@ -110,7 +112,8 @@ fun CategoryPillBadge(
     categoryName: String?,
     modifier: Modifier = Modifier
 ) {
-    val style = CategoryStyleHelper.getCategoryStyle(categoryName)
+    val isDark = LocalIsDarkTheme.current
+    val style = CategoryStyleHelper.getCategoryStyle(categoryName, isDark)
     Surface(
         color = style.containerColor,
         shape = RoundedCornerShape(8.dp),
@@ -144,10 +147,18 @@ fun StatCard(
     icon: ImageVector,
     modifier: Modifier = Modifier,
     subtitle: String? = null,
-    containerColor: Color = MaterialTheme.colorScheme.surface,
+    containerColor: Color? = null,
     iconTint: Color = MaterialTheme.colorScheme.primary,
     gradientBackground: Brush? = null
 ) {
+    val isDark = LocalIsDarkTheme.current
+    val effectiveContainerColor = when {
+        gradientBackground != null -> Color.Transparent
+        isDark -> MaterialTheme.colorScheme.surfaceVariant
+        containerColor != null -> containerColor
+        else -> MaterialTheme.colorScheme.surface
+    }
+
     val cardModifier = if (gradientBackground != null) {
         modifier
             .clip(RoundedCornerShape(18.dp))
@@ -160,9 +171,14 @@ fun StatCard(
         modifier = cardModifier,
         shape = RoundedCornerShape(18.dp),
         colors = CardDefaults.cardColors(
-            containerColor = if (gradientBackground != null) Color.Transparent else containerColor
+            containerColor = effectiveContainerColor
         ),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+        elevation = CardDefaults.cardElevation(defaultElevation = if (isDark) 0.dp else 2.dp),
+        border = if (isDark && gradientBackground == null) {
+            BorderStroke(1.dp, iconTint.copy(alpha = 0.25f))
+        } else if (gradientBackground == null) {
+            BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.4f))
+        } else null
     ) {
         Column(
             modifier = Modifier
@@ -186,7 +202,7 @@ fun StatCard(
                         .size(38.dp)
                         .background(
                             if (gradientBackground != null) Color.White.copy(alpha = 0.2f)
-                            else iconTint.copy(alpha = 0.12f),
+                            else iconTint.copy(alpha = if (isDark) 0.22f else 0.12f),
                             CircleShape
                         ),
                     contentAlignment = Alignment.Center

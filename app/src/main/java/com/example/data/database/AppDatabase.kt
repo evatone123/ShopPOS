@@ -19,9 +19,6 @@ import com.example.data.entity.Payment
 import com.example.data.entity.Product
 import com.example.data.entity.Sale
 import com.example.data.entity.SaleItem
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 
 @Database(
     entities = [
@@ -33,7 +30,7 @@ import kotlinx.coroutines.launch
         Payment::class,
         AppSettings::class
     ],
-    version = 1,
+    version = 2,
     exportSchema = false
 )
 abstract class AppDatabase : RoomDatabase() {
@@ -49,6 +46,12 @@ abstract class AppDatabase : RoomDatabase() {
         @Volatile
         private var INSTANCE: AppDatabase? = null
 
+        private val MIGRATION_1_2 = object : androidx.room.migration.Migration(1, 2) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL("ALTER TABLE app_settings ADD COLUMN themeMode TEXT NOT NULL DEFAULT 'SYSTEM'")
+            }
+        }
+
         fun getInstance(context: Context): AppDatabase {
             return INSTANCE ?: synchronized(this) {
                 val instance = Room.databaseBuilder(
@@ -56,13 +59,24 @@ abstract class AppDatabase : RoomDatabase() {
                     AppDatabase::class.java,
                     "shoppos_database.db"
                 )
+                    .addMigrations(MIGRATION_1_2)
+                    .fallbackToDestructiveMigration()
                     .addCallback(object : Callback() {
                         override fun onCreate(db: SupportSQLiteDatabase) {
                             super.onCreate(db)
-                            // Initialize default app settings
-                            CoroutineScope(Dispatchers.IO).launch {
-                                getInstance(context).appSettingsDao().insertOrUpdate(AppSettings())
-                            }
+                            // Initialize default app settings and categories directly in SQLite without coroutine deadlocks
+                            db.execSQL("""
+                                INSERT OR IGNORE INTO app_settings (id, shopName, shopAddress, phone, email, currency, receiptFooter, lowStockThreshold, pinLockEnabled, securityPin, themeMode)
+                                VALUES (1, 'My Shop', 'Accra, Ghana', '050 000 0000', 'info@myshop.com', 'GHS', 'THANK YOU!\nPLEASE COME AGAIN', 10, 0, '1234', 'SYSTEM')
+                            """)
+                            val now = System.currentTimeMillis()
+                            db.execSQL("INSERT OR IGNORE INTO categories (id, name, description, createdAt) VALUES (1, 'Drinks', 'Beverages, juices, water', $now)")
+                            db.execSQL("INSERT OR IGNORE INTO categories (id, name, description, createdAt) VALUES (2, 'Food', 'Groceries, snacks, staples', $now)")
+                            db.execSQL("INSERT OR IGNORE INTO categories (id, name, description, createdAt) VALUES (3, 'Toiletries', 'Personal hygiene, soap, shampoo', $now)")
+                            db.execSQL("INSERT OR IGNORE INTO categories (id, name, description, createdAt) VALUES (4, 'Household', 'Cleaning supplies, tissue', $now)")
+                            db.execSQL("INSERT OR IGNORE INTO categories (id, name, description, createdAt) VALUES (5, 'Electronics', 'Accessories, chargers, cables', $now)")
+                            db.execSQL("INSERT OR IGNORE INTO categories (id, name, description, createdAt) VALUES (6, 'Stationery', 'Pens, books, papers', $now)")
+                            db.execSQL("INSERT OR IGNORE INTO categories (id, name, description, createdAt) VALUES (7, 'Other', 'General store items', $now)")
                         }
                     })
                     .build()

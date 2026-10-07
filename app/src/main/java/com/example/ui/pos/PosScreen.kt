@@ -86,6 +86,7 @@ import com.example.ui.components.BarcodeScannerDialog
 import com.example.ui.components.CategoryPillBadge
 import com.example.ui.components.EmptyStateView
 import com.example.ui.components.ReceiptDialog
+import com.example.ui.theme.AppThemeColors
 import com.example.ui.theme.CategoryStyleHelper
 import com.example.util.CurrencyFormatter
 
@@ -614,7 +615,7 @@ fun PosProductCard(
                     text = CurrencyFormatter.formatPesewas(product.sellingPricePesewas, currency),
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Black,
-                    color = if (isOutOfStock) MaterialTheme.colorScheme.onSurfaceVariant else Color(0xFF047857)
+                    color = if (isOutOfStock) MaterialTheme.colorScheme.onSurfaceVariant else AppThemeColors.successText
                 )
 
                 Spacer(modifier = Modifier.height(2.dp))
@@ -629,8 +630,8 @@ fun PosProductCard(
                         else -> "Stock: ${product.stockQuantity}"
                     }
                     val stockColor = when {
-                        isOutOfStock -> Color(0xFFE11D48)
-                        isLowStock -> Color(0xFFD97706)
+                        isOutOfStock -> AppThemeColors.dangerText
+                        isLowStock -> AppThemeColors.warningText
                         else -> MaterialTheme.colorScheme.onSurfaceVariant
                     }
                     Text(

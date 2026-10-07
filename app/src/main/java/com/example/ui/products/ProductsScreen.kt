@@ -70,7 +70,9 @@ import com.example.ui.components.CategoryPillBadge
 import com.example.ui.components.EmptyStateView
 import com.example.ui.components.SearchInputBar
 import com.example.ui.components.StockStatusBadge
+import com.example.ui.theme.AppThemeColors
 import com.example.ui.theme.CategoryStyleHelper
+import com.example.ui.theme.LocalIsDarkTheme
 import com.example.util.CurrencyFormatter
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -81,6 +83,7 @@ fun ProductsScreen(
     modifier: Modifier = Modifier
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val isDark = LocalIsDarkTheme.current
     val snackbarHostState = remember { SnackbarHostState() }
 
     var productToEdit by remember { mutableStateOf<Product?>(null) }
@@ -154,7 +157,7 @@ fun ProductsScreen(
                     }
                     items(uiState.categories) { cat ->
                         val isSelected = uiState.selectedCategoryId == cat.id
-                        val style = CategoryStyleHelper.getCategoryStyle(cat.name)
+                        val style = CategoryStyleHelper.getCategoryStyle(cat.name, isDark)
                         FilterChip(
                             selected = isSelected,
                             onClick = { viewModel.onCategorySelected(cat.id) },
@@ -353,6 +356,7 @@ fun ProductListItemCard(
     onToggleActive: () -> Unit,
     onDelete: () -> Unit
 ) {
+    val isDark = LocalIsDarkTheme.current
     ElevatedCard(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(14.dp),
@@ -448,7 +452,7 @@ fun ProductListItemCard(
                         text = CurrencyFormatter.formatPesewas(product.sellingPricePesewas, currency),
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.Black,
-                        color = Color(0xFF047857)
+                        color = AppThemeColors.successText
                     )
                     Text(
                         text = "Cost: ${CurrencyFormatter.formatPesewas(product.costPricePesewas, currency)} • Stock: ${product.stockQuantity} ${product.unit}",
@@ -461,14 +465,14 @@ fun ProductListItemCard(
                     Surface(
                         onClick = onEdit,
                         shape = CircleShape,
-                        color = Color(0xFFEEF2FF),
+                        color = if (isDark) Color(0xFF312E81).copy(alpha = 0.5f) else Color(0xFFEEF2FF),
                         modifier = Modifier.size(36.dp)
                     ) {
                         Box(contentAlignment = Alignment.Center) {
                             Icon(
                                 Icons.Default.Edit,
                                 contentDescription = "Edit Product",
-                                tint = Color(0xFF4F46E5),
+                                tint = if (isDark) Color(0xFF818CF8) else Color(0xFF4F46E5),
                                 modifier = Modifier.size(18.dp)
                             )
                         }
@@ -477,14 +481,14 @@ fun ProductListItemCard(
                     Surface(
                         onClick = onToggleActive,
                         shape = CircleShape,
-                        color = if (product.active) Color(0xFFFEF3C7) else Color(0xFFD1FAE5),
+                        color = if (product.active) (if (isDark) Color(0xFF78350F).copy(alpha = 0.5f) else Color(0xFFFEF3C7)) else (if (isDark) Color(0xFF064E3B).copy(alpha = 0.5f) else Color(0xFFD1FAE5)),
                         modifier = Modifier.size(36.dp)
                     ) {
                         Box(contentAlignment = Alignment.Center) {
                             Icon(
                                 imageVector = if (product.active) Icons.Default.PauseCircle else Icons.Default.CheckCircle,
                                 contentDescription = if (product.active) "Deactivate" else "Activate",
-                                tint = if (product.active) Color(0xFFD97706) else Color(0xFF059669),
+                                tint = if (product.active) (if (isDark) Color(0xFFFBBF24) else Color(0xFFD97706)) else (if (isDark) Color(0xFF34D399) else Color(0xFF059669)),
                                 modifier = Modifier.size(18.dp)
                             )
                         }
@@ -493,14 +497,14 @@ fun ProductListItemCard(
                     Surface(
                         onClick = onDelete,
                         shape = CircleShape,
-                        color = Color(0xFFFFE4E6),
+                        color = if (isDark) Color(0xFF881337).copy(alpha = 0.5f) else Color(0xFFFFE4E6),
                         modifier = Modifier.size(36.dp)
                     ) {
                         Box(contentAlignment = Alignment.Center) {
                             Icon(
                                 Icons.Default.Delete,
                                 contentDescription = "Delete Product",
-                                tint = Color(0xFFE11D48),
+                                tint = if (isDark) Color(0xFFFB7185) else Color(0xFFE11D48),
                                 modifier = Modifier.size(18.dp)
                             )
                         }

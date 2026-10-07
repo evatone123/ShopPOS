@@ -3,6 +3,7 @@ package com.example.ui.settings
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -23,10 +24,15 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AutoAwesome
 import androidx.compose.material.icons.filled.Backup
+import androidx.compose.material.icons.filled.BrightnessAuto
+import androidx.compose.material.icons.filled.DarkMode
+import androidx.compose.material.icons.filled.LightMode
 import androidx.compose.material.icons.filled.Lock
+import androidx.compose.material.icons.filled.Palette
 import androidx.compose.material.icons.filled.Restore
 import androidx.compose.material.icons.filled.Save
 import androidx.compose.material.icons.filled.Store
+import com.example.ui.theme.LocalIsDarkTheme
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -74,6 +80,7 @@ fun SettingsScreen(
     val snackbarHostState = remember { SnackbarHostState() }
 
     val currentSettings = uiState.settings
+    val isDark = LocalIsDarkTheme.current
 
     var shopName by remember(currentSettings) { mutableStateOf(currentSettings.shopName) }
     var shopAddress by remember(currentSettings) { mutableStateOf(currentSettings.shopAddress) }
@@ -147,6 +154,114 @@ fun SettingsScreen(
                 )
             }
 
+            // Theme & Appearance Card
+            item {
+                ElevatedCard(
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(16.dp),
+                    colors = CardDefaults.elevatedCardColors(containerColor = MaterialTheme.colorScheme.surface)
+                ) {
+                    Column(modifier = Modifier.padding(16.dp)) {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Box(
+                                    modifier = Modifier
+                                        .size(36.dp)
+                                        .background(
+                                            if (isDark) Color(0xFF312E81).copy(alpha = 0.6f) else Color(0xFFEEF2FF),
+                                            CircleShape
+                                        ),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    Icon(
+                                        Icons.Default.Palette,
+                                        contentDescription = null,
+                                        tint = if (isDark) Color(0xFF818CF8) else Color(0xFF4F46E5),
+                                        modifier = Modifier.size(20.dp)
+                                    )
+                                }
+                                Spacer(modifier = Modifier.width(10.dp))
+                                Column {
+                                    Text(
+                                        text = "Theme & Appearance",
+                                        style = MaterialTheme.typography.titleMedium,
+                                        fontWeight = FontWeight.Bold
+                                    )
+                                    Text(
+                                        text = when (currentSettings.themeMode) {
+                                            "LIGHT" -> "Light Mode active"
+                                            "DARK" -> "Dark Mode active"
+                                            else -> "Following system theme"
+                                        },
+                                        style = MaterialTheme.typography.bodySmall,
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                                    )
+                                }
+                            }
+                        }
+
+                        Spacer(modifier = Modifier.height(14.dp))
+
+                        // 3-way Theme Selector
+                        val themeOptions = listOf(
+                            Triple("SYSTEM", "System", Icons.Default.BrightnessAuto),
+                            Triple("LIGHT", "Light", Icons.Default.LightMode),
+                            Triple("DARK", "Dark", Icons.Default.DarkMode)
+                        )
+
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.spacedBy(8.dp)
+                        ) {
+                            themeOptions.forEach { (modeKey, modeLabel, icon) ->
+                                val isSelected = currentSettings.themeMode == modeKey
+                                Surface(
+                                    onClick = {
+                                        viewModel.updateSettings(currentSettings.copy(themeMode = modeKey))
+                                    },
+                                    modifier = Modifier.weight(1f),
+                                    shape = RoundedCornerShape(12.dp),
+                                    color = if (isSelected) {
+                                        if (isDark) Color(0xFF312E81) else Color(0xFFEEF2FF)
+                                    } else MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f),
+                                    border = if (isSelected) {
+                                        BorderStroke(1.5.dp, if (isDark) Color(0xFF818CF8) else Color(0xFF4F46E5))
+                                    } else null
+                                ) {
+                                    Column(
+                                        modifier = Modifier.padding(vertical = 10.dp, horizontal = 4.dp),
+                                        horizontalAlignment = Alignment.CenterHorizontally,
+                                        verticalArrangement = Arrangement.Center
+                                    ) {
+                                        Icon(
+                                            imageVector = icon,
+                                            contentDescription = null,
+                                            tint = if (isSelected) {
+                                                if (isDark) Color(0xFF818CF8) else Color(0xFF4F46E5)
+                                            } else MaterialTheme.colorScheme.onSurfaceVariant,
+                                            modifier = Modifier.size(20.dp)
+                                        )
+                                        Spacer(modifier = Modifier.height(4.dp))
+                                        Text(
+                                            text = modeLabel,
+                                            style = MaterialTheme.typography.labelMedium,
+                                            fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium,
+                                            color = if (isSelected) {
+                                                if (isDark) Color(0xFF818CF8) else Color(0xFF4F46E5)
+                                            } else MaterialTheme.colorScheme.onSurface
+                                        )
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
             // Shop Profile Card
             item {
                 ElevatedCard(
@@ -159,10 +274,10 @@ fun SettingsScreen(
                             Box(
                                 modifier = Modifier
                                     .size(36.dp)
-                                    .background(Color(0xFFEEF2FF), CircleShape),
+                                    .background(if (isDark) Color(0xFF312E81).copy(alpha = 0.5f) else Color(0xFFEEF2FF), CircleShape),
                                 contentAlignment = Alignment.Center
                             ) {
-                                Icon(Icons.Default.Store, contentDescription = null, tint = Color(0xFF4F46E5), modifier = Modifier.size(20.dp))
+                                Icon(Icons.Default.Store, contentDescription = null, tint = if (isDark) Color(0xFF818CF8) else Color(0xFF4F46E5), modifier = Modifier.size(20.dp))
                             }
                             Spacer(modifier = Modifier.width(10.dp))
                             Text(
@@ -291,10 +406,10 @@ fun SettingsScreen(
                             Box(
                                 modifier = Modifier
                                     .size(36.dp)
-                                    .background(Color(0xFFFEF3C7), CircleShape),
+                                    .background(if (isDark) Color(0xFF78350F).copy(alpha = 0.5f) else Color(0xFFFEF3C7), CircleShape),
                                 contentAlignment = Alignment.Center
                             ) {
-                                Icon(Icons.Default.Lock, contentDescription = null, tint = Color(0xFFD97706), modifier = Modifier.size(20.dp))
+                                Icon(Icons.Default.Lock, contentDescription = null, tint = if (isDark) Color(0xFFFBBF24) else Color(0xFFD97706), modifier = Modifier.size(20.dp))
                             }
                             Spacer(modifier = Modifier.width(10.dp))
                             Text(
@@ -371,10 +486,10 @@ fun SettingsScreen(
                             Box(
                                 modifier = Modifier
                                     .size(36.dp)
-                                    .background(Color(0xFFDCFCE7), CircleShape),
+                                    .background(if (isDark) Color(0xFF064E3B).copy(alpha = 0.5f) else Color(0xFFDCFCE7), CircleShape),
                                 contentAlignment = Alignment.Center
                             ) {
-                                Icon(Icons.Default.Backup, contentDescription = null, tint = Color(0xFF16A34A), modifier = Modifier.size(20.dp))
+                                Icon(Icons.Default.Backup, contentDescription = null, tint = if (isDark) Color(0xFF34D399) else Color(0xFF16A34A), modifier = Modifier.size(20.dp))
                             }
                             Spacer(modifier = Modifier.width(10.dp))
                             Text(
@@ -403,7 +518,7 @@ fun SettingsScreen(
                                 onClick = {
                                     exportLauncher.launch("ShopPOS_Backup_${System.currentTimeMillis()}.json")
                                 },
-                                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF16A34A)),
+                                colors = ButtonDefaults.buttonColors(containerColor = if (isDark) Color(0xFF059669) else Color(0xFF16A34A)),
                                 enabled = !uiState.isExporting,
                                 contentPadding = PaddingValues(horizontal = 10.dp, vertical = 10.dp),
                                 modifier = Modifier.weight(1f)
@@ -454,7 +569,7 @@ fun SettingsScreen(
                     modifier = Modifier.fillMaxWidth(),
                     shape = RoundedCornerShape(16.dp),
                     colors = CardDefaults.cardColors(
-                        containerColor = Color(0xFFF5F3FF)
+                        containerColor = if (isDark) MaterialTheme.colorScheme.surfaceVariant else Color(0xFFF5F3FF)
                     )
                 ) {
                     Row(
@@ -467,10 +582,10 @@ fun SettingsScreen(
                         Box(
                             modifier = Modifier
                                 .size(36.dp)
-                                .background(Color(0xFFEDE9FE), CircleShape),
+                                .background(if (isDark) Color(0xFF4C1D95).copy(alpha = 0.6f) else Color(0xFFEDE9FE), CircleShape),
                             contentAlignment = Alignment.Center
                         ) {
-                            Icon(Icons.Default.AutoAwesome, contentDescription = null, tint = Color(0xFF7C3AED), modifier = Modifier.size(20.dp))
+                            Icon(Icons.Default.AutoAwesome, contentDescription = null, tint = if (isDark) Color(0xFFA78BFA) else Color(0xFF7C3AED), modifier = Modifier.size(20.dp))
                         }
                         Spacer(modifier = Modifier.width(10.dp))
                         Column(modifier = Modifier.weight(1f)) {
@@ -478,7 +593,7 @@ fun SettingsScreen(
                                 text = "Load Demo Store Items",
                                 style = MaterialTheme.typography.titleSmall,
                                 fontWeight = FontWeight.Bold,
-                                color = Color(0xFF5B21B6)
+                                color = if (isDark) Color(0xFFA78BFA) else Color(0xFF5B21B6)
                             )
                             Text(
                                 text = "Injects sample Ghanaian retail inventory (Coca-Cola, Bread, Milo, Rice) and demo sales.",
@@ -492,7 +607,7 @@ fun SettingsScreen(
                         Button(
                             onClick = { viewModel.loadDemoData() },
                             contentPadding = PaddingValues(horizontal = 12.dp, vertical = 6.dp),
-                            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF7C3AED))
+                            colors = ButtonDefaults.buttonColors(containerColor = if (isDark) Color(0xFF6D28D9) else Color(0xFF7C3AED))
                         ) {
                             Row(
                                 verticalAlignment = Alignment.CenterVertically,

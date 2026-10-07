@@ -164,5 +164,6 @@ data class AppSettings(
     val lowStockThreshold: Int = 10,
     val logoUri: String? = null,
     val securityPin: String = "1234",
-    val pinLockEnabled: Boolean = false
+    val pinLockEnabled: Boolean = false,
+    val themeMode: String = "SYSTEM" // "SYSTEM", "LIGHT", "DARK"
 )

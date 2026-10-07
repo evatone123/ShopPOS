@@ -51,7 +51,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.ui.components.StatCard
+import com.example.ui.theme.AppThemeColors
 import com.example.ui.theme.CategoryStyleHelper
+import com.example.ui.theme.LocalIsDarkTheme
 import com.example.util.CurrencyFormatter
 
 @Composable
@@ -60,6 +62,7 @@ fun ReportsScreen(
     modifier: Modifier = Modifier
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val isDark = LocalIsDarkTheme.current
 
     Scaffold(modifier = modifier) { innerPadding ->
         LazyColumn(
@@ -191,7 +194,7 @@ fun ReportsScreen(
                             )
                         } else {
                             uiState.paymentBreakdowns.forEach { breakdown ->
-                                val style = CategoryStyleHelper.getPaymentStyle(breakdown.method)
+                                val style = CategoryStyleHelper.getPaymentStyle(breakdown.method, isDark)
                                 Column(modifier = Modifier.padding(vertical = 6.dp)) {
                                     Row(
                                         modifier = Modifier.fillMaxWidth(),
@@ -313,10 +316,10 @@ fun ReportsScreen(
                                         verticalAlignment = Alignment.CenterVertically
                                     ) {
                                         val (rankBg, rankText) = when (index) {
-                                            0 -> Color(0xFFFEF3C7) to Color(0xFFB45309)
-                                            1 -> Color(0xFFE2E8F0) to Color(0xFF475569)
-                                            2 -> Color(0xFFFFEDD5) to Color(0xFFC2410C)
-                                            else -> Color(0xFFF1F5F9) to Color(0xFF64748B)
+                                            0 -> if (isDark) Color(0xFF78350F) to Color(0xFFFDE68A) else Color(0xFFFEF3C7) to Color(0xFFB45309)
+                                            1 -> if (isDark) Color(0xFF334155) to Color(0xFFE2E8F0) else Color(0xFFE2E8F0) to Color(0xFF475569)
+                                            2 -> if (isDark) Color(0xFF7C2D12) to Color(0xFFFFEDD5) else Color(0xFFFFEDD5) to Color(0xFFC2410C)
+                                            else -> if (isDark) Color(0xFF1E293B) to Color(0xFF94A3B8) else Color(0xFFF1F5F9) to Color(0xFF64748B)
                                         }
                                         Surface(
                                             color = rankBg,
@@ -351,7 +354,7 @@ fun ReportsScreen(
                                         CurrencyFormatter.formatPesewas(item.totalRevenuePesewas, uiState.settings.currency),
                                         style = MaterialTheme.typography.bodyMedium,
                                         fontWeight = FontWeight.ExtraBold,
-                                        color = Color(0xFF047857),
+                                        color = AppThemeColors.successText,
                                         modifier = Modifier.weight(1f)
                                     )
                                 }
@@ -429,7 +432,7 @@ fun ReportsScreen(
                                 CurrencyFormatter.formatPesewas(potentialProfit, uiState.settings.currency),
                                 style = MaterialTheme.typography.bodyMedium,
                                 fontWeight = FontWeight.Bold,
-                                color = Color(0xFF16A34A)
+                                color = AppThemeColors.successText
                             )
                         }
                     }
