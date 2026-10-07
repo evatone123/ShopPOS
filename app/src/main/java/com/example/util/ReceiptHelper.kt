@@ -212,15 +212,27 @@ object ReceiptHelper {
     }
 
     fun shareReceipt(context: Context, saleWithItems: SaleWithItems, settings: AppSettings) {
-        val text = generatePlainTextReceipt(saleWithItems, settings)
-        val sendIntent = Intent().apply {
-            action = Intent.ACTION_SEND
-            putExtra(Intent.EXTRA_TEXT, text)
-            putExtra(Intent.EXTRA_SUBJECT, "Receipt ${saleWithItems.sale.receiptNumber}")
-            type = "text/plain"
+        try {
+            val pdfFile = PdfReceiptHelper.generateSaleReceiptPdf(context, saleWithItems, settings)
+            PdfReceiptHelper.sharePdfFile(context, pdfFile, "Receipt ${saleWithItems.sale.receiptNumber}")
+        } catch (e: Exception) {
+            // Fallback to plain text sharing if PDF generation encounters any error
+            val text = generatePlainTextReceipt(saleWithItems, settings)
+            val sendIntent = Intent().apply {
+                action = Intent.ACTION_SEND
+                putExtra(Intent.EXTRA_TEXT, text)
+                putExtra(Intent.EXTRA_SUBJECT, "Receipt ${saleWithItems.sale.receiptNumber}")
+                type = "text/plain"
+            }
+            val shareIntent = Intent.createChooser(sendIntent, "Share Receipt")
+            shareIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            context.startActivity(shareIntent)
         }
-        val shareIntent = Intent.createChooser(sendIntent, "Share Receipt")
-        context.startActivity(shareIntent)
+    }
+
+    fun sharePdfReceipt(context: Context, saleWithItems: SaleWithItems, settings: AppSettings) {
+        val pdfFile = PdfReceiptHelper.generateSaleReceiptPdf(context, saleWithItems, settings)
+        PdfReceiptHelper.sharePdfFile(context, pdfFile, "Receipt ${saleWithItems.sale.receiptNumber}")
     }
 
     private fun centerText(text: String, width: Int): String {

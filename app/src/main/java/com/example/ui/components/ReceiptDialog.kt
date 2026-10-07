@@ -20,6 +20,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.PictureAsPdf
 import androidx.compose.material.icons.filled.Print
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.Button
@@ -293,7 +294,7 @@ fun ReceiptDialog(
 
                 Spacer(modifier = Modifier.height(16.dp))
 
-                // Actions: Print, Share, Done
+                // Actions: Print, PDF Share, Done
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(8.dp),
@@ -301,7 +302,7 @@ fun ReceiptDialog(
                 ) {
                     OutlinedButton(
                         onClick = { ReceiptHelper.printReceipt(context, saleWithItems, settings) },
-                        contentPadding = PaddingValues(horizontal = 8.dp, vertical = 8.dp),
+                        contentPadding = PaddingValues(horizontal = 6.dp, vertical = 8.dp),
                         modifier = Modifier.weight(1f)
                     ) {
                         Row(
@@ -316,23 +317,23 @@ fun ReceiptDialog(
 
                     OutlinedButton(
                         onClick = { ReceiptHelper.shareReceipt(context, saleWithItems, settings) },
-                        contentPadding = PaddingValues(horizontal = 8.dp, vertical = 8.dp),
-                        modifier = Modifier.weight(1f)
+                        contentPadding = PaddingValues(horizontal = 6.dp, vertical = 8.dp),
+                        modifier = Modifier.weight(1.1f)
                     ) {
                         Row(
                             verticalAlignment = Alignment.CenterVertically,
                             horizontalArrangement = Arrangement.Center
                         ) {
-                            Icon(Icons.Default.Share, contentDescription = null, modifier = Modifier.size(16.dp))
+                            Icon(Icons.Default.PictureAsPdf, contentDescription = null, modifier = Modifier.size(16.dp))
                             Spacer(modifier = Modifier.width(4.dp))
-                            Text("Share", maxLines = 1, softWrap = false)
+                            Text("PDF Share", maxLines = 1, softWrap = false)
                         }
                     }
 
                     Button(
                         onClick = onDismiss,
-                        contentPadding = PaddingValues(horizontal = 12.dp, vertical = 8.dp),
-                        modifier = Modifier.weight(1f)
+                        contentPadding = PaddingValues(horizontal = 8.dp, vertical = 8.dp),
+                        modifier = Modifier.weight(0.9f)
                     ) {
                         Text("Done", maxLines = 1, softWrap = false)
                     }

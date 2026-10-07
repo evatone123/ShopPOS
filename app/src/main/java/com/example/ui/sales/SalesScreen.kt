@@ -23,6 +23,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Cancel
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Payment
+import androidx.compose.material.icons.filled.PictureAsPdf
 import androidx.compose.material.icons.filled.Print
 import androidx.compose.material.icons.filled.ReceiptLong
 import androidx.compose.material.icons.filled.Share
@@ -314,14 +315,14 @@ fun SalesScreen(
                                         Surface(
                                             onClick = { ReceiptHelper.printReceipt(context, saleWithItems, uiState.settings) },
                                             shape = CircleShape,
-                                            color = Color(0xFFEEF2FF),
+                                            color = if (isDark) Color(0xFF312E81).copy(alpha = 0.5f) else Color(0xFFEEF2FF),
                                             modifier = Modifier.size(34.dp)
                                         ) {
                                             Box(contentAlignment = Alignment.Center) {
                                                 Icon(
                                                     Icons.Default.Print,
-                                                    contentDescription = "Print",
-                                                    tint = Color(0xFF4F46E5),
+                                                    contentDescription = "Print Receipt",
+                                                    tint = if (isDark) Color(0xFF818CF8) else Color(0xFF4F46E5),
                                                     modifier = Modifier.size(16.dp)
                                                 )
                                             }
@@ -330,14 +331,14 @@ fun SalesScreen(
                                         Surface(
                                             onClick = { ReceiptHelper.shareReceipt(context, saleWithItems, uiState.settings) },
                                             shape = CircleShape,
-                                            color = Color(0xFFCCFBF1),
+                                            color = if (isDark) Color(0xFF064E3B).copy(alpha = 0.5f) else Color(0xFFCCFBF1),
                                             modifier = Modifier.size(34.dp)
                                         ) {
                                             Box(contentAlignment = Alignment.Center) {
                                                 Icon(
-                                                    Icons.Default.Share,
-                                                    contentDescription = "Share",
-                                                    tint = Color(0xFF0D9488),
+                                                    Icons.Default.PictureAsPdf,
+                                                    contentDescription = "Share PDF Receipt",
+                                                    tint = if (isDark) Color(0xFF34D399) else Color(0xFF0D9488),
                                                     modifier = Modifier.size(16.dp)
                                                 )
                                             }

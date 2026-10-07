@@ -25,11 +25,15 @@ import androidx.compose.material.icons.filled.BarChart
 import androidx.compose.material.icons.filled.EmojiEvents
 import androidx.compose.material.icons.filled.Inventory
 import androidx.compose.material.icons.filled.Leaderboard
+import androidx.compose.material.icons.filled.PictureAsPdf
 import androidx.compose.material.icons.filled.PointOfSale
 import androidx.compose.material.icons.filled.Receipt
 import androidx.compose.material.icons.filled.ReceiptLong
+import androidx.compose.material.icons.filled.Share
 import androidx.compose.material.icons.filled.ShoppingBag
 import androidx.compose.material.icons.filled.TrendingUp
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ElevatedCard
@@ -38,6 +42,7 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -47,6 +52,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -55,12 +61,14 @@ import com.example.ui.theme.AppThemeColors
 import com.example.ui.theme.CategoryStyleHelper
 import com.example.ui.theme.LocalIsDarkTheme
 import com.example.util.CurrencyFormatter
+import com.example.util.PdfReceiptHelper
 
 @Composable
 fun ReportsScreen(
     viewModel: ReportsViewModel,
     modifier: Modifier = Modifier
 ) {
+    val context = LocalContext.current
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val isDark = LocalIsDarkTheme.current
 
@@ -75,16 +83,50 @@ fun ReportsScreen(
         ) {
             item {
                 Spacer(modifier = Modifier.height(4.dp))
-                Text(
-                    text = "Sales & Inventory Reports",
-                    style = MaterialTheme.typography.headlineMedium,
-                    fontWeight = FontWeight.Bold
-                )
-                Text(
-                    text = "Track sales revenue, payment methods and stock valuation.",
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Column(modifier = Modifier.weight(1f)) {
+                        Text(
+                            text = "Sales & Reports",
+                            style = MaterialTheme.typography.headlineMedium,
+                            fontWeight = FontWeight.Bold
+                        )
+                        Text(
+                            text = "Track sales revenue, payment methods & valuation.",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+
+                    // Export / Share PDF Summary Button
+                    Button(
+                        onClick = {
+                            val pdfFile = PdfReceiptHelper.generateTransactionSummaryPdf(context, uiState)
+                            PdfReceiptHelper.sharePdfFile(context, pdfFile, "Transaction Summary - ${uiState.period.label}")
+                        },
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = if (isDark) Color(0xFF4F46E5) else Color(0xFF4338CA)
+                        ),
+                        contentPadding = PaddingValues(horizontal = 12.dp, vertical = 8.dp)
+                    ) {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Icon(
+                                Icons.Default.PictureAsPdf,
+                                contentDescription = null,
+                                modifier = Modifier.size(16.dp)
+                            )
+                            Spacer(modifier = Modifier.width(6.dp))
+                            Text(
+                                text = "PDF Report",
+                                style = MaterialTheme.typography.labelMedium,
+                                fontWeight = FontWeight.Bold
+                            )
+                        }
+                    }
+                }
             }
 
             // Period Filter Chips
