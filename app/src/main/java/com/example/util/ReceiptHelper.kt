@@ -6,6 +6,8 @@ import android.print.PrintAttributes
 import android.print.PrintManager
 import android.webkit.WebView
 import android.webkit.WebViewClient
+import android.widget.Toast
+import androidx.print.PrintHelper
 import com.example.data.entity.AppSettings
 import com.example.data.entity.SaleWithItems
 import java.text.SimpleDateFormat
@@ -189,6 +191,11 @@ object ReceiptHelper {
     }
 
     fun printReceipt(context: Context, saleWithItems: SaleWithItems, settings: AppSettings) {
+        if (!PrintHelper.systemSupportsPrint()) {
+            Toast.makeText(context, "Printing is not supported on this device", Toast.LENGTH_SHORT).show()
+            shareReceipt(context, saleWithItems, settings)
+            return
+        }
         val webView = WebView(context)
         val htmlContent = generateHtmlReceipt(saleWithItems, settings)
         webView.webViewClient = object : WebViewClient() {
