@@ -24,6 +24,27 @@ data class CartItem(
     val subtotalPesewas: Long get() = product.sellingPricePesewas * quantity
 }
 
+data class StockReceivingItem(
+    val product: Product,
+    val quantityToAdd: Int,
+    val unitCostPesewas: Long = product.costPricePesewas,
+    val updateCatalogCost: Boolean = false,
+    val previousStock: Int = product.stockQuantity
+) {
+    val subtotalCostPesewas: Long get() = unitCostPesewas * quantityToAdd.coerceAtLeast(0)
+    val newStockQuantity: Int get() = product.stockQuantity + quantityToAdd
+}
+
+data class StockReceivingResult(
+    val referenceNumber: String,
+    val supplierName: String,
+    val notes: String,
+    val items: List<StockReceivingItem>,
+    val totalUnitsReceived: Int,
+    val totalCostPesewas: Long,
+    val timestamp: Long = System.currentTimeMillis()
+)
+
 class PosRepository(private val db: AppDatabase) {
     private val productDao = db.productDao()
     private val categoryDao = db.categoryDao()
@@ -167,6 +188,96 @@ class PosRepository(private val db: AppDatabase) {
                 )
             )
             Result.success(newStock)
+        }
+    }
+
+    suspend fun generateNextReceivingReference(): String {
+        val dateFormat = SimpleDateFormat("yyyyMMdd", Locale.US)
+        val todayStr = dateFormat.format(Date())
+        val randomNum = (1000..9999).random()
+        return "RCV-$todayStr-$randomNum"
+    }
+
+    suspend fun receiveStockBatch(
+        items: List<StockReceivingItem>,
+        referenceNumber: String,
+        supplierName: String,
+        notes: String
+    ): Result<StockReceivingResult> {
+        val validItems = items.filter { it.quantityToAdd > 0 }
+        if (validItems.isEmpty()) {
+            return Result.failure(IllegalArgumentException("No items with valid quantities to receive"))
+        }
+
+        return db.withTransaction {
+            var totalUnits = 0
+            var totalCost = 0L
+            val processedItems = mutableListOf<StockReceivingItem>()
+
+            for (item in validItems) {
+                val currentProduct = productDao.getProductById(item.product.id)
+                    ?: return@withTransaction Result.failure(
+                        IllegalArgumentException("Product '${item.product.name}' was not found in catalog.")
+                    )
+
+                val prevStock = currentProduct.stockQuantity
+                val newStock = prevStock + item.quantityToAdd
+                totalUnits += item.quantityToAdd
+                totalCost += item.subtotalCostPesewas
+
+                // Update product: update stock, and update cost if requested
+                if (item.updateCatalogCost && item.unitCostPesewas > 0L) {
+                    productDao.update(
+                        currentProduct.copy(
+                            costPricePesewas = item.unitCostPesewas,
+                            stockQuantity = newStock,
+                            updatedAt = System.currentTimeMillis()
+                        )
+                    )
+                } else {
+                    productDao.updateStock(currentProduct.id, newStock)
+                }
+
+                val reasonParts = mutableListOf<String>()
+                reasonParts.add("Stock Received")
+                if (supplierName.isNotBlank()) {
+                    reasonParts.add("Supplier: $supplierName")
+                }
+                if (notes.isNotBlank()) {
+                    reasonParts.add(notes)
+                }
+
+                inventoryMovementDao.insert(
+                    InventoryMovement(
+                        productId = currentProduct.id,
+                        type = "ADD_STOCK",
+                        quantity = item.quantityToAdd,
+                        previousStock = prevStock,
+                        newStock = newStock,
+                        reason = reasonParts.joinToString(" • "),
+                        reference = referenceNumber
+                    )
+                )
+
+                processedItems.add(
+                    item.copy(
+                        product = currentProduct.copy(stockQuantity = newStock),
+                        previousStock = prevStock
+                    )
+                )
+            }
+
+            Result.success(
+                StockReceivingResult(
+                    referenceNumber = referenceNumber,
+                    supplierName = supplierName,
+                    notes = notes,
+                    items = processedItems,
+                    totalUnitsReceived = totalUnits,
+                    totalCostPesewas = totalCost,
+                    timestamp = System.currentTimeMillis()
+                )
+            )
         }
     }
 

@@ -96,6 +96,7 @@ fun MainScreen(
     val isDark = com.example.ui.theme.LocalIsDarkTheme.current
     var currentDestination by remember { mutableStateOf(PosNavDestination.DASHBOARD) }
     var prefilledProductBarcode by remember { mutableStateOf<String?>(null) }
+    var inventoryInitialTab by remember { mutableStateOf(0) }
 
     // Core persistent ViewModels needed for app-level navigation state and badge counters
     val posViewModel: PosViewModel = viewModel { PosViewModel(repository) }
@@ -194,16 +195,22 @@ fun MainScreen(
                     ScreenContent(
                         destination = currentDestination,
                         prefilledBarcode = prefilledProductBarcode,
+                        inventoryInitialTab = inventoryInitialTab,
                         repository = repository,
                         posViewModel = posViewModel,
                         settingsViewModel = settingsViewModel,
                         onNavigate = { dest ->
                             prefilledProductBarcode = null
+                            if (dest == PosNavDestination.INVENTORY) inventoryInitialTab = 0
                             currentDestination = dest
                         },
                         onNavigateToAddProductWithBarcode = { barcode ->
                             prefilledProductBarcode = barcode
                             currentDestination = PosNavDestination.PRODUCTS
+                        },
+                        onNavigateToReceiveStock = {
+                            inventoryInitialTab = 1
+                            currentDestination = PosNavDestination.INVENTORY
                         }
                     )
                 }
@@ -314,6 +321,7 @@ fun MainScreen(
                                 selected = isSelected,
                                 onClick = {
                                     prefilledProductBarcode = null
+                                    if (destination == PosNavDestination.INVENTORY) inventoryInitialTab = 0
                                     currentDestination = destination
                                 },
                                 colors = NavigationBarItemDefaults.colors(
@@ -354,16 +362,22 @@ fun MainScreen(
                     ScreenContent(
                         destination = currentDestination,
                         prefilledBarcode = prefilledProductBarcode,
+                        inventoryInitialTab = inventoryInitialTab,
                         repository = repository,
                         posViewModel = posViewModel,
                         settingsViewModel = settingsViewModel,
                         onNavigate = { dest ->
                             prefilledProductBarcode = null
+                            if (dest == PosNavDestination.INVENTORY) inventoryInitialTab = 0
                             currentDestination = dest
                         },
                         onNavigateToAddProductWithBarcode = { barcode ->
                             prefilledProductBarcode = barcode
                             currentDestination = PosNavDestination.PRODUCTS
+                        },
+                        onNavigateToReceiveStock = {
+                            inventoryInitialTab = 1
+                            currentDestination = PosNavDestination.INVENTORY
                         }
                     )
                 }
@@ -376,11 +390,13 @@ fun MainScreen(
 private fun ScreenContent(
     destination: PosNavDestination,
     prefilledBarcode: String?,
+    inventoryInitialTab: Int,
     repository: PosRepository,
     posViewModel: PosViewModel,
     settingsViewModel: SettingsViewModel,
     onNavigate: (PosNavDestination) -> Unit,
-    onNavigateToAddProductWithBarcode: (String) -> Unit
+    onNavigateToAddProductWithBarcode: (String) -> Unit,
+    onNavigateToReceiveStock: () -> Unit
 ) {
     when (destination) {
         PosNavDestination.DASHBOARD -> {
@@ -390,7 +406,8 @@ private fun ScreenContent(
                 onNavigateToPos = { onNavigate(PosNavDestination.POS) },
                 onNavigateToAddProduct = { onNavigate(PosNavDestination.PRODUCTS) },
                 onNavigateToInventory = { onNavigate(PosNavDestination.INVENTORY) },
-                onNavigateToSales = { onNavigate(PosNavDestination.SALES) }
+                onNavigateToSales = { onNavigate(PosNavDestination.SALES) },
+                onNavigateToReceiveStock = onNavigateToReceiveStock
             )
         }
         PosNavDestination.POS -> PosScreen(
@@ -401,13 +418,15 @@ private fun ScreenContent(
             val productsViewModel: ProductsViewModel = viewModel { ProductsViewModel(repository) }
             ProductsScreen(
                 viewModel = productsViewModel,
-                prefilledBarcode = prefilledBarcode
+                prefilledBarcode = prefilledBarcode,
+                onNavigateToReceiveStock = onNavigateToReceiveStock
             )
         }
         PosNavDestination.INVENTORY -> {
             val inventoryViewModel: InventoryViewModel = viewModel { InventoryViewModel(repository) }
             InventoryScreen(
-                viewModel = inventoryViewModel
+                viewModel = inventoryViewModel,
+                initialTab = inventoryInitialTab
             )
         }
         PosNavDestination.SALES -> {

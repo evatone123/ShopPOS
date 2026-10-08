@@ -27,6 +27,7 @@ import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.FilterList
 import androidx.compose.material.icons.filled.Inventory2
+import androidx.compose.material.icons.filled.LocalShipping
 import androidx.compose.material.icons.filled.PauseCircle
 import androidx.compose.material.icons.filled.QrCodeScanner
 import androidx.compose.material.icons.filled.Search
@@ -80,6 +81,7 @@ import com.example.util.CurrencyFormatter
 fun ProductsScreen(
     viewModel: ProductsViewModel,
     prefilledBarcode: String? = null,
+    onNavigateToReceiveStock: () -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -108,12 +110,25 @@ fun ProductsScreen(
     Scaffold(
         snackbarHost = { SnackbarHost(snackbarHostState) },
         floatingActionButton = {
-            ExtendedFloatingActionButton(
-                onClick = { showAddDialog = true },
-                icon = { Icon(Icons.Default.Add, contentDescription = null) },
-                text = { Text("Add Product", maxLines = 1, softWrap = false) },
-                modifier = Modifier.testTag("add_product_fab")
-            )
+            Column(
+                horizontalAlignment = Alignment.End,
+                verticalArrangement = Arrangement.spacedBy(10.dp)
+            ) {
+                ExtendedFloatingActionButton(
+                    onClick = onNavigateToReceiveStock,
+                    containerColor = MaterialTheme.colorScheme.secondaryContainer,
+                    contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
+                    icon = { Icon(Icons.Default.LocalShipping, contentDescription = null) },
+                    text = { Text("Receive Stock", maxLines = 1, overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis) },
+                    modifier = Modifier.testTag("products_receive_stock_fab")
+                )
+                ExtendedFloatingActionButton(
+                    onClick = { showAddDialog = true },
+                    icon = { Icon(Icons.Default.Add, contentDescription = null) },
+                    text = { Text("Add Product", maxLines = 1, overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis) },
+                    modifier = Modifier.testTag("add_product_fab")
+                )
+            }
         },
         modifier = modifier
     ) { innerPadding ->
@@ -231,7 +246,7 @@ fun ProductsScreen(
                             ) {
                                 Icon(Icons.Default.Sort, contentDescription = null, modifier = Modifier.size(16.dp))
                                 Spacer(modifier = Modifier.width(4.dp))
-                                Text(uiState.sortOption.label, maxLines = 1, softWrap = false)
+                                Text(uiState.sortOption.label, maxLines = 1, overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis)
                             }
                         }
 

@@ -9,6 +9,7 @@ import android.graphics.pdf.PdfDocument
 import androidx.core.content.FileProvider
 import com.example.data.entity.AppSettings
 import com.example.data.entity.SaleWithItems
+import com.example.data.repository.StockReceivingResult
 import com.example.ui.reports.ReportsUiState
 import java.io.File
 import java.io.FileOutputStream
@@ -444,6 +445,163 @@ object PdfReceiptHelper {
         val reportsDir = File(context.cacheDir, "reports").apply { mkdirs() }
         val periodTag = reportsUiState.period.name.lowercase(Locale.US)
         val pdfFile = File(reportsDir, "Transaction_Summary_${periodTag}.pdf")
+
+        FileOutputStream(pdfFile).use { out ->
+            document.writeTo(out)
+        }
+        document.close()
+
+        return pdfFile
+    }
+
+    /**
+     * Generates a PDF Goods Received Note / Stock Delivery Receipt.
+     */
+    fun generateStockReceivingPdf(
+        context: Context,
+        result: StockReceivingResult,
+        settings: AppSettings
+    ): File {
+        val currency = settings.currency
+        val dateFormat = SimpleDateFormat("dd MMM yyyy  hh:mm a", Locale.US)
+        val formattedDate = dateFormat.format(Date(result.timestamp))
+
+        val pageWidth = 340
+        val estimatedHeight = (360 + result.items.size * 38).coerceAtLeast(540)
+        val pageHeight = estimatedHeight
+
+        val document = PdfDocument()
+        val pageInfo = PdfDocument.PageInfo.Builder(pageWidth, pageHeight, 1).create()
+        val page = document.startPage(pageInfo)
+        val canvas = page.canvas
+
+        canvas.drawColor(Color.WHITE)
+
+        val boldPaint = Paint().apply {
+            color = Color.rgb(15, 23, 42)
+            textSize = 10f
+            typeface = Typeface.create(Typeface.MONOSPACE, Typeface.BOLD)
+            isAntiAlias = true
+        }
+
+        val regularPaint = Paint().apply {
+            color = Color.rgb(30, 41, 59)
+            textSize = 9.5f
+            typeface = Typeface.create(Typeface.MONOSPACE, Typeface.NORMAL)
+            isAntiAlias = true
+        }
+
+        val titlePaint = Paint().apply {
+            color = Color.rgb(15, 23, 42)
+            textSize = 14f
+            typeface = Typeface.create(Typeface.MONOSPACE, Typeface.BOLD)
+            isAntiAlias = true
+            textAlign = Paint.Align.CENTER
+        }
+
+        val centerPaint = Paint().apply {
+            color = Color.rgb(71, 85, 105)
+            textSize = 9.5f
+            typeface = Typeface.create(Typeface.MONOSPACE, Typeface.NORMAL)
+            isAntiAlias = true
+            textAlign = Paint.Align.CENTER
+        }
+
+        val linePaint = Paint().apply {
+            color = Color.rgb(148, 163, 184)
+            strokeWidth = 1f
+            style = Paint.Style.STROKE
+        }
+
+        var y = 28f
+        val centerX = pageWidth / 2f
+        val leftMargin = 16f
+        val rightMargin = pageWidth - 16f
+
+        canvas.drawText(settings.shopName.uppercase(), centerX, y, titlePaint)
+        y += 15f
+        if (settings.shopAddress.isNotBlank()) {
+            canvas.drawText(settings.shopAddress, centerX, y, centerPaint)
+            y += 13f
+        }
+        if (settings.phone.isNotBlank()) {
+            canvas.drawText("Tel: ${settings.phone}", centerX, y, centerPaint)
+            y += 15f
+        }
+
+        canvas.drawLine(leftMargin, y, rightMargin, y, linePaint)
+        y += 16f
+
+        val docTitlePaint = Paint(titlePaint).apply {
+            textSize = 12f
+            color = Color.rgb(5, 150, 105)
+        }
+        canvas.drawText("STOCK RECEIVING NOTE", centerX, y, docTitlePaint)
+        y += 16f
+
+        drawRow(canvas, "Reference:", result.referenceNumber, leftMargin, rightMargin, y, regularPaint, boldPaint)
+        y += 13f
+        drawRow(canvas, "Date & Time:", formattedDate, leftMargin, rightMargin, y, regularPaint, regularPaint)
+        y += 13f
+        if (result.supplierName.isNotBlank()) {
+            drawRow(canvas, "Supplier:", result.supplierName, leftMargin, rightMargin, y, regularPaint, boldPaint)
+            y += 13f
+        }
+        if (result.notes.isNotBlank()) {
+            drawRow(canvas, "Notes:", result.notes, leftMargin, rightMargin, y, regularPaint, regularPaint)
+            y += 13f
+        }
+
+        y += 4f
+        canvas.drawLine(leftMargin, y, rightMargin, y, linePaint)
+        y += 14f
+
+        canvas.drawText("PRODUCT / SKU", leftMargin, y, boldPaint)
+        val rightAlignBold = Paint(boldPaint).apply { textAlign = Paint.Align.RIGHT }
+        canvas.drawText("QTY / COST", rightMargin, y, rightAlignBold)
+        y += 8f
+        canvas.drawLine(leftMargin, y, rightMargin, y, linePaint)
+        y += 14f
+
+        for (item in result.items) {
+            val nameText = if (item.product.name.length > 22) item.product.name.take(20) + ".." else item.product.name
+            canvas.drawText(nameText, leftMargin, y, boldPaint)
+            val subtotalStr = CurrencyFormatter.formatPesewas(item.subtotalCostPesewas, currency)
+            val rightAlignReg = Paint(regularPaint).apply { textAlign = Paint.Align.RIGHT }
+            canvas.drawText(subtotalStr, rightMargin, y, rightAlignReg)
+            y += 12f
+
+            val detailText = "Stock: ${item.previousStock} → ${item.newStockQuantity} (${item.product.unit})"
+            canvas.drawText(detailText, leftMargin, y, regularPaint)
+
+            val unitCostFormatted = CurrencyFormatter.formatPesewas(item.unitCostPesewas, currency)
+            val qtyText = "+${item.quantityToAdd} @ $unitCostFormatted"
+            canvas.drawText(qtyText, rightMargin, y, rightAlignReg)
+            y += 15f
+        }
+
+        canvas.drawLine(leftMargin, y, rightMargin, y, linePaint)
+        y += 14f
+
+        drawRow(canvas, "Distinct Products:", "${result.items.size}", leftMargin, rightMargin, y, regularPaint, regularPaint)
+        y += 13f
+        drawRow(canvas, "Total Units Received:", "${result.totalUnitsReceived}", leftMargin, rightMargin, y, boldPaint, boldPaint)
+        y += 14f
+        val totalCostFormatted = CurrencyFormatter.formatPesewas(result.totalCostPesewas, currency)
+        val largeBold = Paint(boldPaint).apply { textSize = 11.5f }
+        drawRow(canvas, "TOTAL RECEIVING COST:", totalCostFormatted, leftMargin, rightMargin, y, largeBold, largeBold)
+        y += 20f
+
+        canvas.drawLine(leftMargin, y, rightMargin, y, linePaint)
+        y += 16f
+        canvas.drawText("RECEIVED & VERIFIED INTO INVENTORY", centerX, y, centerPaint)
+        y += 12f
+        canvas.drawText("ShopPOS Inventory Management", centerX, y, centerPaint)
+
+        document.finishPage(page)
+
+        val receiptsDir = File(context.cacheDir, "receiving").apply { mkdirs() }
+        val pdfFile = File(receiptsDir, "Receiving_${result.referenceNumber}.pdf")
 
         FileOutputStream(pdfFile).use { out ->
             document.writeTo(out)
