@@ -20,6 +20,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Fullscreen
 import androidx.compose.material.icons.filled.PictureAsPdf
 import androidx.compose.material.icons.filled.Print
 import androidx.compose.material.icons.filled.Share
@@ -39,6 +40,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -58,7 +60,8 @@ import java.util.Locale
 fun ReceiptDialog(
     saleWithItems: SaleWithItems,
     settings: AppSettings,
-    onDismiss: () -> Unit
+    onDismiss: () -> Unit,
+    onOpenPreviewScreen: (() -> Unit)? = null
 ) {
     val context = LocalContext.current
     val sale = saleWithItems.sale
@@ -82,7 +85,7 @@ fun ReceiptDialog(
                     .fillMaxWidth()
                     .padding(20.dp)
             ) {
-                // Header with Close
+                // Header with Close & Preview
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween,
@@ -116,8 +119,22 @@ fun ReceiptDialog(
                             )
                         }
                     }
-                    IconButton(onClick = onDismiss) {
-                        Icon(Icons.Default.Close, contentDescription = "Close")
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        if (onOpenPreviewScreen != null) {
+                            IconButton(
+                                onClick = onOpenPreviewScreen,
+                                modifier = Modifier.testTag("dialog_open_preview_button")
+                            ) {
+                                Icon(
+                                    Icons.Default.Fullscreen,
+                                    contentDescription = "Open Full Receipt Preview",
+                                    tint = MaterialTheme.colorScheme.primary
+                                )
+                            }
+                        }
+                        IconButton(onClick = onDismiss) {
+                            Icon(Icons.Default.Close, contentDescription = "Close")
+                        }
                     }
                 }
 
@@ -294,48 +311,65 @@ fun ReceiptDialog(
 
                 Spacer(modifier = Modifier.height(16.dp))
 
-                // Actions: Print, PDF Share, Done
+                // Actions: Preview, Print, PDF Share, Done
                 Row(
                     modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    horizontalArrangement = Arrangement.spacedBy(6.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
+                    if (onOpenPreviewScreen != null) {
+                        OutlinedButton(
+                            onClick = onOpenPreviewScreen,
+                            contentPadding = PaddingValues(horizontal = 4.dp, vertical = 8.dp),
+                            modifier = Modifier.weight(1f)
+                        ) {
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.Center
+                            ) {
+                                Icon(Icons.Default.Fullscreen, contentDescription = null, modifier = Modifier.size(16.dp))
+                                Spacer(modifier = Modifier.width(3.dp))
+                                Text("Preview", maxLines = 1, softWrap = false, fontSize = 12.sp)
+                            }
+                        }
+                    }
+
                     OutlinedButton(
                         onClick = { ReceiptHelper.printReceipt(context, saleWithItems, settings) },
-                        contentPadding = PaddingValues(horizontal = 6.dp, vertical = 8.dp),
-                        modifier = Modifier.weight(1f)
+                        contentPadding = PaddingValues(horizontal = 4.dp, vertical = 8.dp),
+                        modifier = Modifier.weight(0.9f)
                     ) {
                         Row(
                             verticalAlignment = Alignment.CenterVertically,
                             horizontalArrangement = Arrangement.Center
                         ) {
                             Icon(Icons.Default.Print, contentDescription = null, modifier = Modifier.size(16.dp))
-                            Spacer(modifier = Modifier.width(4.dp))
-                            Text("Print", maxLines = 1, softWrap = false)
+                            Spacer(modifier = Modifier.width(3.dp))
+                            Text("Print", maxLines = 1, softWrap = false, fontSize = 12.sp)
                         }
                     }
 
                     OutlinedButton(
                         onClick = { ReceiptHelper.shareReceipt(context, saleWithItems, settings) },
-                        contentPadding = PaddingValues(horizontal = 6.dp, vertical = 8.dp),
-                        modifier = Modifier.weight(1.1f)
+                        contentPadding = PaddingValues(horizontal = 4.dp, vertical = 8.dp),
+                        modifier = Modifier.weight(1f)
                     ) {
                         Row(
                             verticalAlignment = Alignment.CenterVertically,
                             horizontalArrangement = Arrangement.Center
                         ) {
                             Icon(Icons.Default.PictureAsPdf, contentDescription = null, modifier = Modifier.size(16.dp))
-                            Spacer(modifier = Modifier.width(4.dp))
-                            Text("PDF Share", maxLines = 1, softWrap = false)
+                            Spacer(modifier = Modifier.width(3.dp))
+                            Text("Share", maxLines = 1, softWrap = false, fontSize = 12.sp)
                         }
                     }
 
                     Button(
                         onClick = onDismiss,
-                        contentPadding = PaddingValues(horizontal = 8.dp, vertical = 8.dp),
-                        modifier = Modifier.weight(0.9f)
+                        contentPadding = PaddingValues(horizontal = 6.dp, vertical = 8.dp),
+                        modifier = Modifier.weight(0.85f)
                     ) {
-                        Text("Done", maxLines = 1, softWrap = false)
+                        Text("Done", maxLines = 1, softWrap = false, fontSize = 12.sp)
                     }
                 }
             }

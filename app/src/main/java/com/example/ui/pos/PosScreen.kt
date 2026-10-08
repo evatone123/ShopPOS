@@ -86,6 +86,7 @@ import com.example.ui.components.BarcodeScannerDialog
 import com.example.ui.components.CategoryPillBadge
 import com.example.ui.components.EmptyStateView
 import com.example.ui.components.ReceiptDialog
+import com.example.ui.receipt.ReceiptPreviewScreen
 import com.example.ui.theme.AppThemeColors
 import com.example.ui.theme.CategoryStyleHelper
 import com.example.util.CurrencyFormatter
@@ -103,6 +104,7 @@ fun PosScreen(
     var showCameraScanner by remember { mutableStateOf(false) }
     var showMobileCartSheet by remember { mutableStateOf(false) }
     var showDiscountDialog by remember { mutableStateOf(false) }
+    var showReceiptPreviewScreen by remember { mutableStateOf(false) }
 
     LaunchedEffect(uiState.error) {
         uiState.error?.let {
@@ -387,13 +389,25 @@ fun PosScreen(
         )
     }
 
-    // Receipt Modal after successful sale
+    // Receipt Modal / Preview after successful sale
     uiState.completedSale?.let { saleWithItems ->
-        ReceiptDialog(
-            saleWithItems = saleWithItems,
-            settings = uiState.settings,
-            onDismiss = { viewModel.dismissReceipt() }
-        )
+        if (showReceiptPreviewScreen) {
+            ReceiptPreviewScreen(
+                saleWithItems = saleWithItems,
+                settings = uiState.settings,
+                onBack = {
+                    showReceiptPreviewScreen = false
+                    viewModel.dismissReceipt()
+                }
+            )
+        } else {
+            ReceiptDialog(
+                saleWithItems = saleWithItems,
+                settings = uiState.settings,
+                onDismiss = { viewModel.dismissReceipt() },
+                onOpenPreviewScreen = { showReceiptPreviewScreen = true }
+            )
+        }
     }
 }
 

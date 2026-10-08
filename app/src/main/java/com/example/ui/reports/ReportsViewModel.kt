@@ -41,6 +41,7 @@ data class ReportsUiState(
     val products: List<Product> = emptyList(),
     val totalInventoryStockValueCostPesewas: Long = 0L,
     val totalInventoryStockValueRetailPesewas: Long = 0L,
+    val sales: List<SaleWithItems> = emptyList(),
     val settings: AppSettings = AppSettings()
 )
 
@@ -96,6 +97,7 @@ class ReportsViewModel(private val repository: PosRepository) : ViewModel() {
             products = activeProducts,
             totalInventoryStockValueCostPesewas = costVal,
             totalInventoryStockValueRetailPesewas = retailVal,
+            sales = salesWithItems,
             settings = settings ?: AppSettings()
         )
     }.stateIn(

@@ -25,6 +25,7 @@ import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Payment
 import androidx.compose.material.icons.filled.PictureAsPdf
 import androidx.compose.material.icons.filled.Print
+import androidx.compose.material.icons.filled.Receipt
 import androidx.compose.material.icons.filled.ReceiptLong
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.AlertDialog
@@ -64,6 +65,7 @@ import com.example.data.entity.SaleWithItems
 import com.example.ui.components.EmptyStateView
 import com.example.ui.components.ReceiptDialog
 import com.example.ui.components.SearchInputBar
+import com.example.ui.receipt.ReceiptPreviewScreen
 import com.example.ui.theme.AppThemeColors
 import com.example.ui.theme.CategoryStyleHelper
 import com.example.ui.theme.LocalIsDarkTheme
@@ -313,6 +315,22 @@ fun SalesScreen(
 
                                     Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
                                         Surface(
+                                            onClick = { selectedSaleForReceipt = saleWithItems },
+                                            shape = CircleShape,
+                                            color = if (isDark) Color(0xFF1E293B) else Color(0xFFF1F5F9),
+                                            modifier = Modifier.size(34.dp)
+                                        ) {
+                                            Box(contentAlignment = Alignment.Center) {
+                                                Icon(
+                                                    Icons.Default.Receipt,
+                                                    contentDescription = "Receipt Preview",
+                                                    tint = MaterialTheme.colorScheme.primary,
+                                                    modifier = Modifier.size(16.dp)
+                                                )
+                                            }
+                                        }
+
+                                        Surface(
                                             onClick = { ReceiptHelper.printReceipt(context, saleWithItems, uiState.settings) },
                                             shape = CircleShape,
                                             color = if (isDark) Color(0xFF312E81).copy(alpha = 0.5f) else Color(0xFFEEF2FF),
@@ -364,12 +382,14 @@ fun SalesScreen(
         }
     }
 
-    // Receipt Dialog
+    // Receipt Preview Screen
     selectedSaleForReceipt?.let { saleWithItems ->
-        ReceiptDialog(
+        ReceiptPreviewScreen(
             saleWithItems = saleWithItems,
             settings = uiState.settings,
-            onDismiss = { selectedSaleForReceipt = null }
+            allSales = uiState.sales,
+            onSelectSale = { selectedSaleForReceipt = it },
+            onBack = { selectedSaleForReceipt = null }
         )
     }
 

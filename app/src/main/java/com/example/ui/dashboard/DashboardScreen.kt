@@ -67,6 +67,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.data.entity.SaleWithItems
 import com.example.ui.components.ReceiptDialog
 import com.example.ui.components.StatCard
+import com.example.ui.receipt.ReceiptPreviewScreen
 import com.example.ui.theme.AppThemeColors
 import com.example.ui.theme.CategoryStyleHelper
 import com.example.ui.theme.LocalIsDarkTheme
@@ -666,10 +667,12 @@ fun DashboardScreen(
     }
 
     selectedSaleForReceipt?.let { sale ->
-        ReceiptDialog(
+        ReceiptPreviewScreen(
             saleWithItems = sale,
             settings = uiState.settings,
-            onDismiss = { selectedSaleForReceipt = null }
+            allSales = uiState.recentSales,
+            onSelectSale = { selectedSaleForReceipt = it },
+            onBack = { selectedSaleForReceipt = null }
         )
     }
 }

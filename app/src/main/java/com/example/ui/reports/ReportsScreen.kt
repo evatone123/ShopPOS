@@ -48,6 +48,9 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -56,7 +59,9 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.example.data.entity.SaleWithItems
 import com.example.ui.components.StatCard
+import com.example.ui.receipt.ReceiptPreviewScreen
 import com.example.ui.theme.AppThemeColors
 import com.example.ui.theme.CategoryStyleHelper
 import com.example.ui.theme.LocalIsDarkTheme
@@ -71,6 +76,7 @@ fun ReportsScreen(
     val context = LocalContext.current
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val isDark = LocalIsDarkTheme.current
+    var previewSale by remember { mutableStateOf<SaleWithItems?>(null) }
 
     Scaffold(modifier = modifier) { innerPadding ->
         LazyColumn(
@@ -101,29 +107,52 @@ fun ReportsScreen(
                         )
                     }
 
-                    // Export / Share PDF Summary Button
-                    Button(
-                        onClick = {
-                            val pdfFile = PdfReceiptHelper.generateTransactionSummaryPdf(context, uiState)
-                            PdfReceiptHelper.sharePdfFile(context, pdfFile, "Transaction Summary - ${uiState.period.label}")
-                        },
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = if (isDark) Color(0xFF4F46E5) else Color(0xFF4338CA)
-                        ),
-                        contentPadding = PaddingValues(horizontal = 12.dp, vertical = 8.dp)
-                    ) {
-                        Row(verticalAlignment = Alignment.CenterVertically) {
-                            Icon(
-                                Icons.Default.PictureAsPdf,
-                                contentDescription = null,
-                                modifier = Modifier.size(16.dp)
-                            )
-                            Spacer(modifier = Modifier.width(6.dp))
-                            Text(
-                                text = "PDF Report",
-                                style = MaterialTheme.typography.labelMedium,
-                                fontWeight = FontWeight.Bold
-                            )
+                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                        if (uiState.sales.isNotEmpty()) {
+                            OutlinedButton(
+                                onClick = { previewSale = uiState.sales.first() },
+                                contentPadding = PaddingValues(horizontal = 10.dp, vertical = 8.dp)
+                            ) {
+                                Row(verticalAlignment = Alignment.CenterVertically) {
+                                    Icon(
+                                        Icons.Default.Receipt,
+                                        contentDescription = null,
+                                        modifier = Modifier.size(16.dp)
+                                    )
+                                    Spacer(modifier = Modifier.width(4.dp))
+                                    Text(
+                                        text = "Receipt",
+                                        style = MaterialTheme.typography.labelMedium,
+                                        fontWeight = FontWeight.Bold
+                                    )
+                                }
+                            }
+                        }
+
+                        // Export / Share PDF Summary Button
+                        Button(
+                            onClick = {
+                                val pdfFile = PdfReceiptHelper.generateTransactionSummaryPdf(context, uiState)
+                                PdfReceiptHelper.sharePdfFile(context, pdfFile, "Transaction Summary - ${uiState.period.label}")
+                            },
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = if (isDark) Color(0xFF4F46E5) else Color(0xFF4338CA)
+                            ),
+                            contentPadding = PaddingValues(horizontal = 12.dp, vertical = 8.dp)
+                        ) {
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Icon(
+                                    Icons.Default.PictureAsPdf,
+                                    contentDescription = null,
+                                    modifier = Modifier.size(16.dp)
+                                )
+                                Spacer(modifier = Modifier.width(6.dp))
+                                Text(
+                                    text = "PDF Report",
+                                    style = MaterialTheme.typography.labelMedium,
+                                    fontWeight = FontWeight.Bold
+                                )
+                            }
                         }
                     }
                 }
@@ -481,5 +510,16 @@ fun ReportsScreen(
                 }
             }
         }
+    }
+
+    // Receipt Preview Screen
+    previewSale?.let { saleWithItems ->
+        ReceiptPreviewScreen(
+            saleWithItems = saleWithItems,
+            settings = uiState.settings,
+            allSales = uiState.sales,
+            onSelectSale = { previewSale = it },
+            onBack = { previewSale = null }
+        )
     }
 }
